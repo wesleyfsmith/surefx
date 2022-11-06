@@ -10,8 +10,8 @@ module.exports = {
     'no-multi-spaces': ['error'],
     'react/prop-type': 0
   },
-  'plugins': [
-    'meteor'
-  ],
+  // 'plugins': [
+  //   'meteor'
+  // ],
   'extends': ['eslint:recommended', 'plugin:react/recommended', 'next/core-web-vitals']
 };

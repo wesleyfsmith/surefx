@@ -4,7 +4,7 @@ import {
   usePrepareContractWrite,
   useContractWrite,
   useWaitForTransaction,
-} from 'wagmi'
+} from 'wagmi';
 
 const Statistics = () => {
   return (
@@ -42,18 +42,18 @@ const Statistics = () => {
         </article>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const CurrencyPicker = () => {
   const [currency, setCurrency] = useState('USD');
-  const selectChange = (e) => {
+  const selectChange = (e: any) => {
     if (e.target.value === 'USD') {
       setCurrency('COP');
     } else {
       setCurrency('USD');
     }
-  }
+  };
   return (
     <div>
       <div >
@@ -78,8 +78,8 @@ const CurrencyPicker = () => {
 
 
     </div>
-  )
-}
+  );
+};
 
 const AmountInput = () => {
   return (
@@ -89,8 +89,8 @@ const AmountInput = () => {
       </label>
       <input type="text" placeholder="Type here" className="input input-bordered w-full" />
     </div>
-  )
-}
+  );
+};
 
 const Stats = () => {
   return (
@@ -125,7 +125,7 @@ const Stats = () => {
 
     </div>
   );
-}
+};
 
 const OpenContract = ({ addContract }) => {
   const [startDate, setStartDate] = useState(new Date());
@@ -183,7 +183,7 @@ const CollateralSlider = () => {
     setSlide(e.target.value);
     const percentAmount = (+e.target.value / 25) * 5;
     setPercent(percentAmount);
-  }
+  };
   return (
     <div>
       <label className="label">
@@ -198,8 +198,8 @@ const CollateralSlider = () => {
         <span>|</span>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const DurationSlider = () => {
   return (
@@ -211,8 +211,8 @@ const DurationSlider = () => {
         <option>180 Days</option>
       </select>
     </div>
-  )
-}
+  );
+};
 
 const CurrentContractItem = ({ contract }) => {
   return (
@@ -237,12 +237,12 @@ const CurrentContractItem = ({ contract }) => {
 
       <button className="btn btn-secondary btn-outline">Close</button>
     </div>
-  )
-}
+  );
+};
 
 const CurrentContracts = ({ contracts }) => {
   const contractElements = contracts.map((contract) => {
-    return <CurrentContractItem contract={contract} />
+    return <CurrentContractItem contract={contract} />;
   });
   return (
     <div className="m-4">
@@ -252,39 +252,39 @@ const CurrentContracts = ({ contracts }) => {
       {contractElements}
     </div>
   );
-}
+};
 
 const abi = [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    'inputs': [],
+    'stateMutability': 'nonpayable',
+    'type': 'constructor'
   },
   {
-    "inputs": [],
-    "name": "createContract",
-    "outputs": [
+    'inputs': [],
+    'name': 'createContract',
+    'outputs': [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        'internalType': 'uint256',
+        'name': '',
+        'type': 'uint256'
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    'stateMutability': 'nonpayable',
+    'type': 'function'
   },
   {
-    "inputs": [],
-    "name": "stake",
-    "outputs": [
+    'inputs': [],
+    'name': 'stake',
+    'outputs': [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        'internalType': 'uint256',
+        'name': '',
+        'type': 'uint256'
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    'stateMutability': 'nonpayable',
+    'type': 'function'
   }
 ];
 
@@ -308,7 +308,7 @@ export default function Dashboard() {
   });
 
   if (config && config.request) {
-    config.request.gasPrice = "50";
+    config.request.gasPrice = '50';
   }
 
   const { data, error, isError, write } = useContractWrite(config);
@@ -353,8 +353,8 @@ export default function Dashboard() {
     setContracts([...contracts]);
   }
   const addContract = () => {
-    console.log({ write })
-    write?.()
+    console.log({ write });
+    write?.();
     // contracts.push(
     //   {
     //     rate: '$5,115',
@@ -364,7 +364,7 @@ export default function Dashboard() {
     //   }
     // );
     // setContracts([...contracts]);
-  }
+  };
 
 
   return (
