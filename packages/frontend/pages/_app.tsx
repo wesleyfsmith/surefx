@@ -13,6 +13,7 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
   Chain,
+  lightTheme
 } from '@rainbow-me/rainbowkit';
 
 import { useIsMounted } from '../hooks';
@@ -37,8 +38,8 @@ const hardhatChain: Chain = {
 };
 
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, hardhatChain],
-  [alchemyProvider({ apiKey: alchemyId }), publicProvider()]
+  [chain.goerli],
+  [alchemyProvider({ apiKey: 'k1AJPfZO7lFnh0dPXyBlrs9HA95eofr0' }), publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({
@@ -58,9 +59,15 @@ const App = ({ Component, pageProps }: AppProps) => {
   if (!isMounted) return null;
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider coolMode chains={chains}>
+      <RainbowKitProvider coolMode theme={lightTheme({
+        accentColor: '#18A0FB',
+        accentColorForeground: 'white',
+        borderRadius: 'medium',
+        fontStack: 'system',
+        overlayBlur: 'small',
+      })} chains={chains}>
         <NextHead>
-          <title>create-web3</title>
+          <title>SureFX</title>
         </NextHead>
         <Component {...pageProps} />
       </RainbowKitProvider>
