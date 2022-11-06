@@ -127,8 +127,8 @@ const Stats = () => {
   );
 };
 
-const OpenContract = ({ addContract }) => {
-  const [startDate, setStartDate] = useState(new Date());
+const OpenContract = ({ addContract: any }) => {
+  // const [startDate, setStartDate] = useState(new Date());
   return (
     <div className="m-4">
 
