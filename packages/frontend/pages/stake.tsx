@@ -1,5 +1,44 @@
 
 import { Navbar } from '../components/Navbar';
+import {
+  usePrepareContractWrite,
+  useContractWrite,
+  useWaitForTransaction,
+} from 'wagmi';
+
+const abi = [
+  {
+    'inputs': [],
+    'stateMutability': 'nonpayable',
+    'type': 'constructor'
+  },
+  {
+    'inputs': [],
+    'name': 'createContract',
+    'outputs': [
+      {
+        'internalType': 'uint256',
+        'name': '',
+        'type': 'uint256'
+      }
+    ],
+    'stateMutability': 'nonpayable',
+    'type': 'function'
+  },
+  {
+    'inputs': [],
+    'name': 'stake',
+    'outputs': [
+      {
+        'internalType': 'uint256',
+        'name': '',
+        'type': 'uint256'
+      }
+    ],
+    'stateMutability': 'nonpayable',
+    'type': 'function'
+  }
+];
 
 const StakeStats = () => {
   return (
@@ -41,6 +80,27 @@ const Stats = () => {
 };
 
 const StakeSFX = () => {
+
+  const { config } = usePrepareContractWrite({
+    addressOrName: '0xc0f88d928760E2c4AD0DD0A060c3566C23f5fbF7',
+    contractInterface: abi,
+    functionName: 'stake'
+  });
+
+  if (config && config.request) {
+    config.request.gasPrice = '50';
+  }
+
+  const { data, error, isError, write } = useContractWrite(config);
+
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
+  const doWrite = () => {
+    write?.();
+  }
+
   return (
     <div className="flex h-64">
       <div className="border p-4 rounded-lg mt-4 ml-4 mb-4 w-1/2 h-full">
@@ -48,11 +108,11 @@ const StakeSFX = () => {
         <div className="form-control w-full">
           <label className="label">
             <span className="label-text">I want to stake</span>
-            <span className="label-text-alt">Available: 0 SFX</span>
+            <span className="label-text-alt">Available: 10 SFX</span>
           </label>
           <input type="text" placeholder="Type here" className="input input-bordered w-full" />
         </div>
-        <button className="btn btn-primary w-full btn-disabled mt-4">Stake SFX</button>
+        <button onClick={() => doWrite()} className="btn btn-primary w-full mt-4">Stake SFX</button>
       </div>
       <div className="w-full border mt-4 mr-4 mb-4 h-full flex flex-col justify-between">
         <div className="p-4 ">
@@ -86,39 +146,39 @@ const StakeSFX = () => {
   )
 }
 
-const Pool = ({ name }) => {
+const Pool = ({ name, address, apy, utilization, value, price }) => {
   return (
     <div className="flex flex-col m-4 border">
       <div className=" flex justify-between p-4 ">
         <div className="flex flex-col">
           <article>{`${name} Pool`}</article>
-          <article className="text-primary">0xA991...c742</article>
+          <article className="text-primary">{address}</article>
         </div>
 
         <div className="flex flex-col">
           <div className="flex">
             <article className="text-gray-400 mr-2">APY:</article>
-            <article>4.5%</article>
+            <article>{apy}</article>
           </div>
           <div className="flex">
             <article className="text-gray-400 mr-2">Utilization:</article>
-            <article>70.2%</article>
+            <article>{utilization}</article>
           </div>
         </div>
         <div className="flex flex-col">
           <div className="flex">
             <article className="text-gray-400 mr-2">Pool Value:</article>
-            <article>1.2 M USD</article>
+            <article>{value} {name}</article>
           </div>
           <div className="flex">
-            <article className="text-gray-400 mr-2">sfUSDC Price:</article>
-            <article>1.076 USD</article>
+            <article className="text-gray-400 mr-2">sf{name} Price:</article>
+            <article>{price} {name}</article>
           </div>
         </div>
       </div>
       <div className="flex border p-4">
         <div className="flex flex-col justify-center">
-          <article>USDC Balance: 0</article>
+          <article>{name} Balance: 0</article>
         </div>
 
         <button className="btn btn-sm btn-primary ml-2 btn-outline">{`Stake ${name}`}</button>
@@ -131,8 +191,8 @@ const Pool = ({ name }) => {
 const ProvideLiquidity = () => {
   return (
     <div className="flex flex-col">
-      <Pool name="USDC" />
-      <Pool name="COPC" />
+      <Pool name="USDC" address="0xA991...c742" apy="4.5%" utilization='70.2%' value='1.2 M' price='1.076' />
+      <Pool name="COPC" address="0xCBB2...d4a2" apy="2.3%" utilization='63.7%' value='823 K' price='5120.076' />
     </div>
   )
 }

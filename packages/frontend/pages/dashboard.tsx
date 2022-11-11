@@ -14,23 +14,23 @@ const Statistics = () => {
           Current Exchange Rate
         </article>
         <article className="font-bold">
-          1 USD @ 5,000 COP
+          1 USD @ 4,985 COP
         </article>
       </div>
       <div className="w-1/4">
         <article className="text-xs">
-          COP - USD Rate
+          Platform Rate
         </article>
         <article className="font-bold">
-          1 USD @ 5,000 COP
+          1 USD @ 4,875 COP
         </article>
       </div>
       <div className="w-1/4">
         <article className="text-xs">
-          USD - COP Rate
+          Liquidity Available
         </article>
         <article className="font-bold">
-          5,000 COP @ 1 USD
+          450K USD
         </article>
       </div>
       <div className="w-1/5">
@@ -38,7 +38,7 @@ const Statistics = () => {
           Contracts Open
         </article>
         <article className="font-bold">
-          12
+          3
         </article>
       </div>
     </div>
@@ -288,6 +288,8 @@ const abi = [
   }
 ];
 
+let rendersBig = 0;
+
 export default function Dashboard() {
 
   // const { data, error, write } = useContractWrite({
@@ -340,7 +342,7 @@ export default function Dashboard() {
     }
   ]);
 
-  if (isLoading && renders == 0) {
+  if (isLoading && rendersBig == 0) {
     contracts.push(
       {
         rate: '$5,115',
@@ -349,8 +351,9 @@ export default function Dashboard() {
         expiration: 'Jan 6, 2023'
       }
     );
-    setRenders(1);
+    rendersBig = 1;
     setContracts([...contracts]);
+    setRenders(1);
   }
   const addContract = () => {
     console.log({ write });

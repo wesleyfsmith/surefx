@@ -9,7 +9,7 @@ export const Navbar = () => {
   return (
     <div className=" flex bg-base-200 drop-shadow mb-4 p-2 justify-between">
       <div className="w-4/5 flex">
-        <a className="btn btn-ghost normal-case text-xl">SureFX</a>
+        {/* <a className="btn btn-ghost normal-case text-xl">SureFX</a> */}
         <div className="flex flex-col justify-center">
           <div className="flex h-6">
             <ShieldCheckIcon />
