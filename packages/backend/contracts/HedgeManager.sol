@@ -15,26 +15,35 @@ contract HedgeManager is Ownable {
 
     uint256 private copcPool;
 
+    uint256 private lockupTime = 24 days;
+    uint256 private maxHedgeDuration = 90 days;
+
     mapping(address => uint256) private copcBalances;
 
-    uint256 private futureId;
+    uint256 private hedgeId;
 
     mapping(address => bool) private allowList;
 
-    enum ConversionDirection{ USD_TO_COP, COP_TO_USD }
+    enum ConversionDirection {
+        USD_TO_COP,
+        COP_TO_USD
+    }
 
     struct Hedge {
+        ConversionDirection direction;
         uint256 id;
         address owner;
         uint256 amount;
         uint256 collateral;
+        uint256 fee;
         uint256 startDate;
         uint256 duration;
         uint256 lockedInRate;
     }
 
-    mapping(address => uint256) private ownerToFuture;
-    mapping(uint256 => address) private futureToOwner;
+    mapping(uint256 => Hedge) private hedges;
+    mapping(uint256 => address) private hedgeToOwner;
+    mapping(address => uint256[]) private ownerToHedgeIds;
 
     constructor(address _usdcAddress, address _copcAddress) {
         usdcContract = IERC20(_usdcAddress);
@@ -51,64 +60,124 @@ contract HedgeManager is Ownable {
     function getCollateralRequirement(uint256 _amount)
         public
         view
-        returns(uint256)
+        returns (uint256)
     {
         //TODO safemath
         //TODO maybe make this variable for each user that can open contracts
         return _amount * (10 / 100);
     }
 
-    function getFee(uint256 _amount)
-        public
-        view
-        returns(uint256)
-    {
+    function getFee(uint256 _amount) public view returns (uint256) {
         //TODO safemath
         return _amount * (platformFee / 100);
     }
 
-    function getCopcAmountForExchangeRate(uint256 _amountUsd)
-        public
-        view
-        returns(uint256)
-    {
-        return _amountUsd * usdToCopRate;
+    function getAmountForExchangeRate(
+        uint256 _amount,
+        ConversionDirection _direction
+    ) public view returns (uint256) {
+        if (_direction == ConversionDirection.USD_TO_COP) {
+            return _amount * usdToCopRate;
+        }
+        if (_direction == ConversionDirection.COP_TO_USD) {
+            return _amount / usdToCopRate;
+        }
     }
 
+    //TODO this probably doesnt scale but okay for now
+    function getHedges(address _owner) public view returns (uint256[]) {
+        return ownerToHedgeIds[_owner];
+    }
+
+    function liquidateHedge(uint256 _hedgeId) public returns (bool) {
+        Hedge hedge = hedges[_hedgeId];
+        if (now >= hedge.startDate + hedge.duration + lockupTime) {}
+    }
+
+    function closeHedge() {}
+
     //open new USD hedging contract
-    function createUSDHedge(uint256 _duration, uint256 _amountUsd)
-        public
-        returns (uint256)
-    {
-        futureId++;
-        uint256 collateralRequirement = getCollateralRequirement(_amountUsd);
-        uint256 feeRequirement = getFee(_amountUsd);
-        uint256 totalUsdcAmount = _amountUsd + collateralRequirement + feeRequirement;
+    function createHedge(
+        ConversionDirection _direction,
+        uint256 _duration,
+        uint256 _amount
+    ) public returns (bool) {
+        hedgeId++;
+        uint256 collateralRequirement = getCollateralRequirement(_amount);
+        uint256 feeRequirement = getFee(_amount);
+        uint256 totalAmount = _amount + collateralRequirement + feeRequirement;
 
-        //must have the required balance of usdc
-        require(usdcContract.balanceOf(msg.sender) >= totalUsdcAmount);
+        uint256 convertedAmount = getAmountForExchangeRate(_amount, _direction);
 
-        //the pool needs to have the required amount of copc that they want to hedge against
-        require(copcContract.balanceOf(address(this)) >= getCopcAmountForExchangeRate(_amountUsd));
+        if (_direction == ConversionDirection.USD_TO_COP) {
+            //must have the required balance of usdc
+            require(
+                usdcContract.balanceOf(msg.sender) >= totalAmount,
+                "Insufficient USDC to open hedge"
+            );
 
+            //the pool needs to have the required amount of copc that they want to hedge against
+            require(copcContract.balanceOf(address(this)) >= convertedAmount);
+        }
+        if (_direction == ConversionDirection.COP_TO_USD) {
+            require(
+                copcContract.balanceOf(msg.sender) >= totalAmount,
+                "Insufficient COPC to open hedge"
+            );
+            require(copcContract.balanceOf(address(this)) >= convertedAmount);
+        }
 
+        require(
+            _duration <= maxHedgeDuration,
+            "cannot create a hedging contract longer than the maximum duration"
+        );
 
+        //xfer usdc and copc
+        if (_direction == ConversionDirection.USD_TO_COP) {
+            usdcContract.transferFrom(msg.sender, address(this), totalAmount);
+            copcContract.transferFrom(
+                address(this),
+                msg.sender,
+                convertedAmount
+            );
+        }
+        if (_direction == ConversionDirection.COP_TO_USD) {
+            copcContract.transferFrom(msg.sender, address(this), totalAmount);
+            usdcContract.transferFrom(
+                address(this),
+                msg.sender,
+                convertedAmount
+            );
+        }
 
-        Future future = Future(futureId, msg.sender, _amount, )
+        Hedge hedge = Hedge(
+            _direction,
+            hedgeId,
+            msg.sender,
+            _amount,
+            collateralRequirement,
+            feeRequirement,
+            now,
+            _duration,
+            usdToCopRate
+        );
+
+        hedges[hedgeId] = hedge;
+        hedgeToOwner[hedgeId] = msg.sender;
+        ownerToHedgeIds[msg.sender].push(hedgeId);
+
         // future[msg.sender] = 1;
-        return 1;
+        return true;
     }
 
     // provide liquidity for copc
     function depositCopc(uint256 _amount) public {
         copcContract.transferFrom(msg.sender, address(this), _amount);
-        copcBalances[msg.sender] = copcBalances[msg.sender] + _amount; 
+        copcBalances[msg.sender] = copcBalances[msg.sender] + _amount;
     }
 
     function stake() public returns (uint256) {
         ownerToContract[msg.sender] = 1;
         return 2;
     }
-
-
 }
