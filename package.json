@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.12",
+    "@openzeppelin/contracts": "^4.8.0",
     "daisyui": "^2.33.0",
     "flowbite": "^1.5.3",
     "flowbite-react": "^0.3.3",

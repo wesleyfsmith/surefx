@@ -19,10 +19,10 @@ const Statistics = () => {
       </div>
       <div className="w-1/4">
         <article className="text-xs">
-          Platform Rate
+          Platform Fee
         </article>
         <article className="font-bold">
-          1 USD @ 4,875 COP
+          3%
         </article>
       </div>
       <div className="w-1/4">
@@ -30,7 +30,7 @@ const Statistics = () => {
           Liquidity Available
         </article>
         <article className="font-bold">
-          450K USD
+          10K USD
         </article>
       </div>
       <div className="w-1/5">

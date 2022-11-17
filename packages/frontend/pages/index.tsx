@@ -117,11 +117,11 @@ export default function LandingPage() {
               {/* {'We bring together employers and employees to create unique, non-transferable, reliable, user-owned professional reputation profiles that are stored on the blockchain.'} */}
               {'SureFX’s mission is to unlock the power of DeFi and Web3 so anyone can do business in a foreign currency without the risk of losing money when they exchange back to their local currency.'}
             </article>
-            {/* <div className="form-control">
-              <a className="w-full" href={`${Meteor.absoluteUrl()}repbase_whitepaper_v1.11.pdf`} download>
-                <button className="btn btn-primary mt-4 w-full">Learn More</button>
+            <div className="form-control">
+              <a className="w-full" href={`/dashboard`} download>
+                <button className="btn btn-primary mt-4 w-full">Hedge with SureFX</button>
               </a>
-            </div> */}
+            </div>
 
           </div>
           {/* <div className="md:w-1/2 sm:w-full mt-8">
