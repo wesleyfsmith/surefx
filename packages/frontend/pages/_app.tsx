@@ -2,18 +2,23 @@ import * as React from 'react';
 import type { AppProps } from 'next/app';
 import NextHead from 'next/head';
 import '../styles/globals.css';
+import '../styles/tailwind.css';
 
 // Imports
 import { chain, createClient, WagmiConfig, configureChains } from 'wagmi';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
+import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
 import '@rainbow-me/rainbowkit/styles.css';
 import {
   getDefaultWallets,
   RainbowKitProvider,
   Chain,
-  lightTheme
+  lightTheme,
+  wallet,
+  connectorsForWallets
 } from '@rainbow-me/rainbowkit';
 
 import { useIsMounted } from '../hooks';
@@ -39,17 +44,64 @@ const hardhatChain: Chain = {
 
 const { chains, provider } = configureChains(
   [chain.goerli],
-  [alchemyProvider({ apiKey: 'k1AJPfZO7lFnh0dPXyBlrs9HA95eofr0' }), publicProvider()]
+  [alchemyProvider({ apiKey: 'ShHM5xifGO6sDTi8fmzz1nhkX-k2781F' })]
 );
 
-const { connectors } = getDefaultWallets({
-  appName: 'create-web3',
-  chains,
+// const { connectors } = getDefaultWallets({
+//   appName: 'create-web3',
+//   chains,
+// });
+
+const rainbowWeb3AuthConnector = ({ chains }) => ({
+  id: "web3auth",
+  name: "Web3Auth",
+  iconUrl: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
+  iconBackground: "#fff",
+  createConnector: () => {
+    const connector = new Web3AuthConnector({
+      chains: chains,
+      options: {
+        socialLoginConfig: {
+
+        },
+        enableLogging: true,
+        clientId: "YOUR_CLIENT_ID", // Get your own client id from https://dashboard.web3auth.io
+        network: "testnet",
+        chainId: "0x1"
+      },
+    });
+    return {
+      connector,
+    };
+  },
 });
+
+const connectors = connectorsForWallets([
+  {
+    groupName: "Recommended",
+    wallets: [
+      // wallet.rainbow({ chains }),
+      // wallet.walletConnect({ chains }),
+      // wallet.metaMask({ chains }),
+      rainbowWeb3AuthConnector({ chains }),
+    ],
+  },
+]);
 
 const wagmiClient = createClient({
   autoConnect: true,
-  connectors,
+  connectors: [new Web3AuthConnector({
+    chains: chains,
+    options: {
+      socialLoginConfig: {
+
+      },
+      enableLogging: true,
+      clientId: "BA_clSt7ZOqrvctbwpQPJX4oV6tbfm9st0gru2Z6-hYgvYGPThUPRg7UGL4mrL1vDl7-Mlt-Rjia-V4LotS84UA", // Get your own client id from https://dashboard.web3auth.io
+      network: "testnet",
+      chainId: "0x5"
+    },
+  })],
   provider,
 });
 

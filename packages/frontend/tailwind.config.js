@@ -13,7 +13,7 @@ module.exports = {
           ...require("daisyui/src/colors/themes")["[data-theme=light]"],
           "primary": "#18A0FB",
           "neutral": "#333333",
-          "accent": "#545454"
+          "accent": "#003258"
           // "base-100": '#333333'
         },
       }

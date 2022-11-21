@@ -5,10 +5,12 @@ import {
   useContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
+import { CalendarPicker } from '@/components/CalendarPicker';
+import { HedgeConfirmationModal } from '@/components/HedgeConfirmationModal';
 
 const Statistics = () => {
   return (
-    <div className="flex p-4 mx-4 bg-primary text-white rounded-lg justify-between">
+    <div className="flex p-4 mx-4 bg-accent text-white rounded-lg justify-between">
       <div className="w-1/4">
         <article className="text-xs">
           Current Exchange Rate
@@ -146,15 +148,13 @@ const OpenContract = ({ addContract }) => {
           <input datepicker type="text" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
           </input>
         </div> */}
-        <article>
-          Duration
-        </article>
+
         <DurationSlider />
         <CurrencyPicker />
 
         <AmountInput />
 
-        <CollateralSlider />
+        {/* <CollateralSlider /> */}
         <div className="flex mt-4">
           <div className="w-1/2">
             <article className="text-sm">
@@ -204,12 +204,16 @@ const CollateralSlider = () => {
 const DurationSlider = () => {
   return (
     <div>
-      <select className="select w-full select-bordered">
+      <label className="label">
+        <span className="label-text">Expiration Date</span>
+      </label>
+      <CalendarPicker />
+      {/* <select className="select w-full select-bordered">
         <option disabled selected>Pick contract duration</option>
         <option>30 Days</option>
         <option>90 Days</option>
         <option>180 Days</option>
-      </select>
+      </select> */}
     </div>
   );
 };
@@ -315,6 +319,8 @@ export default function Dashboard() {
 
   const { data, error, isError, write } = useContractWrite(config);
 
+  console.log({ config, data, write });
+
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
   });
@@ -390,6 +396,9 @@ export default function Dashboard() {
             {contracts.length > 0 && <CurrentContracts contracts={contracts} />}
           </div>
         </div>
+        <label htmlFor="my-modal-3" className="btn">open modal</label>
+
+        <HedgeConfirmationModal expiration={'Nov 14 2022'} fee={40} colateral={123} baseCurrency={'USD'} lockedInRate={2323} />
       </div>
 
     </div>

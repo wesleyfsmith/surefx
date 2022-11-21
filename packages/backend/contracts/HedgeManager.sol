@@ -18,6 +18,8 @@ contract HedgeManager is Ownable {
     uint256 private lockupTime = 24 days;
     uint256 private maxHedgeDuration = 90 days;
 
+    mapping(address => uint256) private collectedFees;
+
     mapping(address => uint256) private copcBalances;
 
     uint256 private hedgeId;
@@ -51,9 +53,24 @@ contract HedgeManager is Ownable {
         platformFee = 3;
     }
 
+    function getCopcAddress()
+        public
+        view
+        returns (address)
+    {
+        return address(copcContract);
+    }
+
     // set the curret exchange rate of usd -> pesos
     function setExchangeRate(uint256 rate) public onlyOwner {
         usdToCopRate = rate;
+    }
+
+    function getExchangeRate()
+        public view
+        returns (uint256)
+    {
+        return usdToCopRate;
     }
 
     //calculates the collateral requirement in USD
@@ -64,7 +81,7 @@ contract HedgeManager is Ownable {
     {
         //TODO safemath
         //TODO maybe make this variable for each user that can open contracts
-        return _amount * (10 / 100);
+        return _amount / 10;
     }
 
     function getFee(uint256 _amount) public view returns (uint256) {
@@ -85,16 +102,34 @@ contract HedgeManager is Ownable {
     }
 
     //TODO this probably doesnt scale but okay for now
-    function getHedges(address _owner) public view returns (uint256[]) {
+    function getHedges(address _owner) public view returns (uint256[] memory) {
         return ownerToHedgeIds[_owner];
     }
 
     function liquidateHedge(uint256 _hedgeId) public returns (bool) {
-        Hedge hedge = hedges[_hedgeId];
-        if (now >= hedge.startDate + hedge.duration + lockupTime) {}
+        Hedge storage hedge = hedges[_hedgeId];
+        if (block.timestamp >= hedge.startDate + hedge.duration + lockupTime) {
+
+        }
     }
 
-    function closeHedge() {}
+    function getHedgeExpiration(uint256 _hedgeId)
+        public
+        view
+        returns (uint256)
+    {
+
+    }
+
+    function closeHedge(uint256 _hedgeId)
+        public
+        returns (bool)
+    {
+        //person closing must be the hedge owner
+        require(msg.sender == hedgeToOwner[_hedgeId], "only the owner may close the hedge");
+
+        
+    }
 
     //open new USD hedging contract
     function createHedge(
@@ -108,6 +143,8 @@ contract HedgeManager is Ownable {
         uint256 totalAmount = _amount + collateralRequirement + feeRequirement;
 
         uint256 convertedAmount = getAmountForExchangeRate(_amount, _direction);
+
+        //TODO contract has to have sufficient capital in the pool
 
         if (_direction == ConversionDirection.USD_TO_COP) {
             //must have the required balance of usdc
@@ -150,14 +187,14 @@ contract HedgeManager is Ownable {
             );
         }
 
-        Hedge hedge = Hedge(
+        Hedge memory hedge = Hedge(
             _direction,
             hedgeId,
             msg.sender,
             _amount,
             collateralRequirement,
             feeRequirement,
-            now,
+            block.timestamp,
             _duration,
             usdToCopRate
         );
@@ -171,13 +208,18 @@ contract HedgeManager is Ownable {
     }
 
     // provide liquidity for copc
-    function depositCopc(uint256 _amount) public {
+    function addCopcLiquidity(uint256 _amount) public {
         copcContract.transferFrom(msg.sender, address(this), _amount);
         copcBalances[msg.sender] = copcBalances[msg.sender] + _amount;
     }
 
-    function stake() public returns (uint256) {
-        ownerToContract[msg.sender] = 1;
-        return 2;
+    function getCopcLiquidityBalance(address _lp)
+        public
+        view
+        returns (uint256)
+    {
+        return copcBalances[_lp];
     }
+
+
 }

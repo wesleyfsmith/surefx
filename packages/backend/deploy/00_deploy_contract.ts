@@ -36,6 +36,9 @@ const deploy = async () => {
   const HedgeFactory = await hre.ethers.getContractFactory("HedgeManager");
   const HedgeContract = await HedgeFactory.deploy();
 
+  const FakeUSDC = await hre.ethers.getContractFactory("BasicERC20");
+  const FakeUSDCContract = await FakeUSDC.deploy("FakeUSDC", "FUSDC", 6);
+
 
   console.log({ "contract address": HedgeContract.address });
 
