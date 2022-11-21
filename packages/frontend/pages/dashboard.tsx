@@ -49,11 +49,14 @@ const Statistics = () => {
 
 const CurrencyPicker = () => {
   const [currency, setCurrency] = useState('USD');
+  const [oppositeCurrency, setOppositeCurrency] = useState('COP');
   const selectChange = (e: any) => {
     if (e.target.value === 'USD') {
-      setCurrency('COP');
-    } else {
       setCurrency('USD');
+      setOppositeCurrency('COP');
+    } else {
+      setCurrency('COP');
+      setOppositeCurrency('USD');
     }
   };
   return (
@@ -65,15 +68,15 @@ const CurrencyPicker = () => {
         <div className="flex justify-between">
           <div className="form-control w-48">
             <select className="select w-full select-bordered max-w-xs" onChange={selectChange}>
-              <option>COP</option>
               <option>USD</option>
+              <option>COP</option>
             </select>
           </div>
           <div className="flex flex-col justify-center">
             <article className="w-24">for</article>
           </div>
           <div className="flex flex-col justify-center">
-            <article className="w-24 text-2xl">{currency}</article>
+            <article className="w-24 text-2xl">{oppositeCurrency}</article>
           </div>
         </div>
       </div>
@@ -83,13 +86,16 @@ const CurrencyPicker = () => {
   );
 };
 
-const AmountInput = () => {
+const AmountInput = ({amount, setAmount}) => {
+  const updateAmount = (e) => {
+    setAmount(e.target.value);
+  }
   return (
     <div className="form-control w-full">
       <label className="label">
         <span className="label-text">Amount</span>
       </label>
-      <input type="text" placeholder="Type here" className="input input-bordered w-full" />
+      <input type="number" value={amount} onChange={updateAmount} placeholder="Type here" className="input input-bordered w-full" />
     </div>
   );
 };
@@ -129,8 +135,19 @@ const Stats = () => {
   );
 };
 
-const OpenContract = ({ addContract }) => {
+const OpenContract = ({ addContract, setContractDetails }) => {
   const [startDate, setStartDate] = useState(new Date());
+  const [amount, setAmount] = useState(0);
+  const [endDate, setEndDate] = useState(new Date())
+
+  const setDeets = (e) => {
+    setContractDetails({
+      amount,
+      expiration: endDate,
+      baseCurrency: 'USD',
+      lockedInRate: 4000
+    })
+  }
   return (
     <div className="m-4">
 
@@ -148,11 +165,16 @@ const OpenContract = ({ addContract }) => {
           <input datepicker type="text" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
           </input>
         </div> */}
+        <div>
+        <label className="label">
+         <span className="label-text">Expiration Date</span>
+        </label>
+          <CalendarPicker endDate={endDate} setEndDate={setEndDate} />
+        </div>
 
-        <DurationSlider />
         <CurrencyPicker />
 
-        <AmountInput />
+        <AmountInput amount={amount} setAmount={setAmount} />
 
         {/* <CollateralSlider /> */}
         <div className="flex mt-4">
@@ -164,8 +186,11 @@ const OpenContract = ({ addContract }) => {
               $4875 COP - $1 USD
             </article>
           </div>
+          
+
           <div className="w-1/2">
-            <button onClick={addContract} className="btn btn-primary w-full">Create</button>
+          <label onClick={setDeets} htmlFor="my-modal-3" className="btn btn-primary w-full">Create</label>
+            {/* <button onClick={addContract} className="btn btn-primary w-full">Create</button> */}
           </div>
         </div>
 
@@ -296,6 +321,7 @@ let rendersBig = 0;
 
 export default function Dashboard() {
 
+
   // const { data, error, write } = useContractWrite({
   //   addressOrName: '0xc0f88d928760E2c4AD0DD0A060c3566C23f5fbF7',
   //   contractInterface: abi,
@@ -306,6 +332,13 @@ export default function Dashboard() {
   // const { isLoading, isSuccess } = useWaitForTransaction({
   //   hash: data?.hash,
   // })
+
+  const [contractDetails, setContractDetails] = useState({
+    amount: 1901923,
+    expiration: new Date(),
+    baseCurrency: 'USD',
+    lockedInRate: 4000
+  });
 
   const { config } = usePrepareContractWrite({
     addressOrName: '0xc0f88d928760E2c4AD0DD0A060c3566C23f5fbF7',
@@ -390,15 +423,16 @@ export default function Dashboard() {
         {/* <Stats /> */}
         <div className="flex">
           <div className="w-1/2">
-            <OpenContract addContract={addContract} />
+            <OpenContract
+              setContractDetails={setContractDetails}
+             addContract={addContract} />
           </div>
           <div className="w-1/2">
             {contracts.length > 0 && <CurrentContracts contracts={contracts} />}
           </div>
         </div>
-        <label htmlFor="my-modal-3" className="btn">open modal</label>
+        <HedgeConfirmationModal contractDetails={contractDetails} />
 
-        <HedgeConfirmationModal expiration={'Nov 14 2022'} fee={40} colateral={123} baseCurrency={'USD'} lockedInRate={2323} />
       </div>
 
     </div>

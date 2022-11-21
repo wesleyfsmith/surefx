@@ -191,8 +191,8 @@ const Pool = ({ name, address, apy, utilization, value, price }) => {
 const ProvideLiquidity = () => {
   return (
     <div className="flex flex-col">
-      <Pool name="USDC" address="0xA991...c742" apy="4.5%" utilization='70.2%' value='1.2 M' price='1.076' />
       <Pool name="COPC" address="0xCBB2...d4a2" apy="2.3%" utilization='63.7%' value='823 K' price='5120.076' />
+      <Pool name="USDC" address="0xA991...c742" apy="4.5%" utilization='70.2%' value='1.2 M' price='1.076' />
     </div>
   )
 }
@@ -208,16 +208,17 @@ export default function Dashboard() {
       </div>
       <Navbar />
       <div className="max-w-screen-xl mx-auto">
+      <div className="mt-4 ml-4">
+          <article className="text-xl pt-4">Hedging Pools</article>
+        </div>
+
+        <ProvideLiquidity />
         <div className="m-4">
           <article className="text-xl">Stake SFX</article>
           <Stats />
         </div>
         <StakeSFX />
-        <div className="mt-4 ml-4">
-          <article className="text-xl pt-4">Hedging Pools</article>
-        </div>
-
-        <ProvideLiquidity />
+        
       </div>
     </div>
   );

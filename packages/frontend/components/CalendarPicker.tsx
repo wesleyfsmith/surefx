@@ -5,9 +5,9 @@ import { forwardRef, useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
-export const CalendarPicker = () => {
+export const CalendarPicker = ({endDate, setEndDate}) => {
   const [startDate, setStartDate] = useState(new Date())
-  const [endDate, setEndDate] = useState(new Date().setMonth(startDate.getMonth() + 1))
+  
 
   useEffect(() => {
     if (startDate > endDate) setStartDate(endDate)
@@ -230,7 +230,7 @@ const ButtonInput = forwardRef(({ value, onClick }, ref) => (
     onClick={onClick}
     ref={ref}
     type="button"
-    className='inline-flex justify-start w-full px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500'
+    className='inline-flex justify-start w-full px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500'
   >
     {format(new Date(value), 'dd MMMM yyyy')}
   </button>

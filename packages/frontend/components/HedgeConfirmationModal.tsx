@@ -1,6 +1,10 @@
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
 
-export const HedgeConfirmationModal = ({expiration, fee, colateral, baseCurrency, lockedInRate}) => {
+
+//TODO make this view work both ways in the UI
+export const HedgeConfirmationModal = ({contractDetails}) => {
+  const fee = 123;
+  const colateral = 123;
   return (
     <div>
       <input type="checkbox" id="my-modal-3" className="modal-toggle" />
@@ -10,7 +14,7 @@ export const HedgeConfirmationModal = ({expiration, fee, colateral, baseCurrency
             <h3 className="text-lg font-bold">Confirm Hedge Details</h3>
             <div className="flex justify-center">
               <div className="flex flex-col justify-center">
-                <article className="text-3xl">123127</article>
+                <article className="text-3xl">{contractDetails.amount}</article>
                 <article className="text-center">USD</article>
               </div>
               
@@ -25,10 +29,10 @@ export const HedgeConfirmationModal = ({expiration, fee, colateral, baseCurrency
               @ 4000COP = 1USD
               </article>
             </div>
-            <article className="py-2 pt-8">The contract will expire on {expiration}</article>
+            <article className="py-2 pt-8">The contract will expire on {contractDetails.expiration.toDateString()}</article>
             <article className="py-2">Fee: {fee}</article>
             <article className="py-2">Colateral: {colateral}</article>
-            <article className="py-2">USDC Total Required: {lockedInRate}</article>
+            <article className="py-2">USDC Total Required: {contractDetails.lockedInRate}</article>
             <button className="btn btn-primary w-full">Confirm</button>
           </div>
         </div>
