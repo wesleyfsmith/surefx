@@ -47,8 +47,11 @@ export const Navbar = () => {
           </div>
         </div> */}
         </div>
+        <div className="flex flex-col justify-center w-48">
+          <ConnectButton />
+        </div>
+
         <div className="flex flex-col justify-center">
-          {/* <ConnectButton /> */}
           {/* <Web3AuthLoginButton /> */}
           {!isConnected &&
             <button className="btn btn-outline btn-primary w-24 mr-2" onClick={() => connectWallet()}>Sign In</button>

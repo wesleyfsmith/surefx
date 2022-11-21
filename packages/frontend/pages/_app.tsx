@@ -82,26 +82,27 @@ const connectors = connectorsForWallets([
     wallets: [
       // wallet.rainbow({ chains }),
       // wallet.walletConnect({ chains }),
-      // wallet.metaMask({ chains }),
       rainbowWeb3AuthConnector({ chains }),
+      wallet.metaMask({ chains }),
     ],
   },
 ]);
 
 const wagmiClient = createClient({
   autoConnect: true,
-  connectors: [new Web3AuthConnector({
-    chains: chains,
-    options: {
-      socialLoginConfig: {
+  // connectors: [new Web3AuthConnector({
+  //   chains: chains,
+  //   options: {
+  //     socialLoginConfig: {
 
-      },
-      enableLogging: true,
-      clientId: "BA_clSt7ZOqrvctbwpQPJX4oV6tbfm9st0gru2Z6-hYgvYGPThUPRg7UGL4mrL1vDl7-Mlt-Rjia-V4LotS84UA", // Get your own client id from https://dashboard.web3auth.io
-      network: "testnet",
-      chainId: "0x5"
-    },
-  })],
+  //     },
+  //     enableLogging: true,
+  //     clientId: "BA_clSt7ZOqrvctbwpQPJX4oV6tbfm9st0gru2Z6-hYgvYGPThUPRg7UGL4mrL1vDl7-Mlt-Rjia-V4LotS84UA", // Get your own client id from https://dashboard.web3auth.io
+  //     network: "testnet",
+  //     chainId: "0x5"
+  //   },
+  // })],
+  connectors,
   provider,
 });
 

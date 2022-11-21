@@ -33,17 +33,24 @@ const main: DeployFunction = async function ({ getNamedAccounts, deployments }: 
 };
 
 const deploy = async () => {
-  const HedgeFactory = await hre.ethers.getContractFactory("HedgeManager");
-  const HedgeContract = await HedgeFactory.deploy();
 
   const FakeUSDC = await hre.ethers.getContractFactory("BasicERC20");
   const FakeUSDCContract = await FakeUSDC.deploy("FakeUSDC", "FUSDC", 6);
 
+  const COPCFactory = await hre.ethers.getContractFactory("BasicERC20");
+  const COPC = await COPCFactory.deploy("COPC", "COPC", 2);
 
-  console.log({ "contract address": HedgeContract.address });
+  const HedgeFactory = await hre.ethers.getContractFactory("HedgeManager");
+  const HedgeContract = await HedgeFactory.deploy(FakeUSDCContract.address, COPC.address);
 
   await HedgeContract.deployed();
-}
+
+  console.log({ "HedgeManager address": HedgeContract.address });
+  console.log({ "Fake USDC address": FakeUSDCContract.address });
+  console.log({ "COPC address": COPC.address });
+
+
+};
 
 deploy();
 

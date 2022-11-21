@@ -7,45 +7,10 @@ import {
 } from 'wagmi';
 import { CalendarPicker } from '@/components/CalendarPicker';
 import { HedgeConfirmationModal } from '@/components/HedgeConfirmationModal';
+import { ContractList } from '@/components/ContractList';
+import { Statistics } from '@/components/Statistics';
 
-const Statistics = () => {
-  return (
-    <div className="flex p-4 mx-4 bg-accent text-white rounded-lg justify-between">
-      <div className="w-1/4">
-        <article className="text-xs">
-          Current Exchange Rate
-        </article>
-        <article className="font-bold">
-          1 USD @ 4,985 COP
-        </article>
-      </div>
-      <div className="w-1/4">
-        <article className="text-xs">
-          Platform Fee
-        </article>
-        <article className="font-bold">
-          3%
-        </article>
-      </div>
-      <div className="w-1/4">
-        <article className="text-xs">
-          Liquidity Available
-        </article>
-        <article className="font-bold">
-          10K USD
-        </article>
-      </div>
-      <div className="w-1/5">
-        <article className="text-xs">
-          Contracts Open
-        </article>
-        <article className="font-bold">
-          3
-        </article>
-      </div>
-    </div>
-  );
-};
+
 
 const CurrencyPicker = () => {
   const [currency, setCurrency] = useState('USD');
@@ -200,89 +165,6 @@ const OpenContract = ({ addContract, setContractDetails }) => {
   );
 };
 
-const CollateralSlider = () => {
-  const [slide, setSlide] = useState(0);
-  const [percent, setPercent] = useState(0);
-  const click = (e) => {
-    // console.log(e)
-    setSlide(e.target.value);
-    const percentAmount = (+e.target.value / 25) * 5;
-    setPercent(percentAmount);
-  };
-  return (
-    <div>
-      <label className="label">
-        <span className="label-text">{`Collateral ${percent}%`}</span>
-      </label>
-      <input type="range" min="0" max="100" value={slide} className="range" step="25" onChange={click} />
-      <div className="w-full flex justify-between text-xs px-2">
-        <span>|</span>
-        <span>|</span>
-        <span>|</span>
-        <span>|</span>
-        <span>|</span>
-      </div>
-    </div>
-  );
-};
-
-const DurationSlider = () => {
-  return (
-    <div>
-      <label className="label">
-        <span className="label-text">Expiration Date</span>
-      </label>
-      <CalendarPicker />
-      {/* <select className="select w-full select-bordered">
-        <option disabled selected>Pick contract duration</option>
-        <option>30 Days</option>
-        <option>90 Days</option>
-        <option>180 Days</option>
-      </select> */}
-    </div>
-  );
-};
-
-const CurrentContractItem = ({ contract }) => {
-  return (
-    <div className="border rounded-lg flex justify-between p-4 mb-4">
-      <div>
-        <article className="text-sm">Rate</article>
-        <article>{contract.rate}</article>
-      </div>
-      <div>
-        <article className="text-sm">Amount</article>
-        <article>{contract.amount}</article>
-      </div>
-      <div>
-        <article className="text-sm">Collateral Threshold</article>
-        <article className="text-success font-bold">{contract.collateral}</article>
-      </div>
-      <div>
-        <article className="text-sm">Expiration</article>
-        <article>{contract.expiration}</article>
-      </div>
-
-
-      <button className="btn btn-secondary btn-outline">Close</button>
-    </div>
-  );
-};
-
-const CurrentContracts = ({ contracts }) => {
-  const contractElements = contracts.map((contract) => {
-    return <CurrentContractItem contract={contract} />;
-  });
-  return (
-    <div className="m-4">
-      <article className="prose-xl">
-        Open Contracts
-      </article>
-      {contractElements}
-    </div>
-  );
-};
-
 const abi = [
   {
     'inputs': [],
@@ -358,42 +240,6 @@ export default function Dashboard() {
     hash: data?.hash,
   });
 
-  const [renders, setRenders] = useState(0);
-
-  const [contracts, setContracts] = useState([
-    {
-      rate: '$4,982',
-      amount: '$12,000,000.00 COP',
-      collateral: '5%',
-      expiration: 'Dec 11, 2022'
-    },
-    {
-      rate: '$4,872',
-      amount: '$6,500,000.00 COP',
-      collateral: '10%',
-      expiration: 'Dec 31, 2022'
-    },
-    {
-      rate: '$5,015',
-      amount: '$4,000,000.00 COP',
-      collateral: '5%',
-      expiration: 'Jan 31, 2023'
-    }
-  ]);
-
-  if (isLoading && rendersBig == 0) {
-    contracts.push(
-      {
-        rate: '$5,115',
-        amount: '$1,000,000.00 COP',
-        collateral: '5%',
-        expiration: 'Jan 6, 2023'
-      }
-    );
-    rendersBig = 1;
-    setContracts([...contracts]);
-    setRenders(1);
-  }
   const addContract = () => {
     console.log({ write });
     write?.();
@@ -428,7 +274,7 @@ export default function Dashboard() {
              addContract={addContract} />
           </div>
           <div className="w-1/2">
-            {contracts.length > 0 && <CurrentContracts contracts={contracts} />}
+            <ContractList />
           </div>
         </div>
         <HedgeConfirmationModal contractDetails={contractDetails} />
