@@ -41,6 +41,9 @@ contract HedgeManager is Ownable {
         uint256 startDate;
         uint256 duration;
         uint256 lockedInRate;
+        bool closed;
+        bool liquidated;
+        uint256 closeDate;
     }
 
     mapping(uint256 => Hedge) private hedges;
@@ -86,10 +89,23 @@ contract HedgeManager is Ownable {
 
     function getFee(uint256 _amount) public view returns (uint256) {
         //TODO safemath
-        return _amount * (platformFee / 100);
+        return (_amount / 100) * platformFee;
     }
 
     function getAmountForExchangeRate(
+        uint256 _amount,
+        ConversionDirection _direction,
+        uint256 _rate
+    ) public view returns (uint256) {
+        if (_direction == ConversionDirection.USD_TO_COP) {
+            return _amount * _rate;
+        }
+        if (_direction == ConversionDirection.COP_TO_USD) {
+            return _amount / _rate;
+        }
+    }
+
+    function getAmountForCurrentExchangeRate(
         uint256 _amount,
         ConversionDirection _direction
     ) public view returns (uint256) {
@@ -104,6 +120,13 @@ contract HedgeManager is Ownable {
     //TODO this probably doesnt scale but okay for now
     function getHedges(address _owner) public view returns (uint256[] memory) {
         return ownerToHedgeIds[_owner];
+    }
+
+    function getHedge(uint256 _hedgeId)
+        public view
+        returns (Hedge memory)
+    {
+        return hedges[_hedgeId];
     }
 
     function liquidateHedge(uint256 _hedgeId) public returns (bool) {
@@ -123,12 +146,26 @@ contract HedgeManager is Ownable {
 
     function closeHedge(uint256 _hedgeId)
         public
-        returns (bool)
     {
         //person closing must be the hedge owner
         require(msg.sender == hedgeToOwner[_hedgeId], "only the owner may close the hedge");
 
-        
+        Hedge storage hedge = hedges[_hedgeId];
+
+        //hedge cannot be closed or liquidated
+        require(hedge.closed == false, "Hedge is already closed");
+        require(hedge.liquidated == false, "Hedge is already liquidated");
+
+        if (hedge.direction == ConversionDirection.USD_TO_COP) {
+            copcContract.transferFrom(msg.sender, address(this), hedge.amount * hedge.lockedInRate);
+            usdcContract.transfer(msg.sender, hedge.amount);
+        }
+        if (hedge.direction == ConversionDirection.COP_TO_USD) {
+            copcContract.transferFrom(msg.sender, address(this), hedge.amount / hedge.lockedInRate);
+            copcContract.transfer(msg.sender, hedge.amount);
+        }
+        hedge.closed = true;
+        hedge.closeDate = block.timestamp;
     }
 
     //open new USD hedging contract
@@ -136,13 +173,13 @@ contract HedgeManager is Ownable {
         ConversionDirection _direction,
         uint256 _duration,
         uint256 _amount
-    ) public returns (bool) {
+    ) public returns (uint256) {
         hedgeId++;
         uint256 collateralRequirement = getCollateralRequirement(_amount);
         uint256 feeRequirement = getFee(_amount);
         uint256 totalAmount = _amount + collateralRequirement + feeRequirement;
 
-        uint256 convertedAmount = getAmountForExchangeRate(_amount, _direction);
+        uint256 convertedAmount = getAmountForCurrentExchangeRate(_amount, _direction);
 
         //TODO contract has to have sufficient capital in the pool
 
@@ -154,7 +191,7 @@ contract HedgeManager is Ownable {
             );
 
             //the pool needs to have the required amount of copc that they want to hedge against
-            require(copcContract.balanceOf(address(this)) >= convertedAmount);
+            require(copcContract.balanceOf(address(this)) >= convertedAmount, "Insufficient liquidity to open contract");
         }
         if (_direction == ConversionDirection.COP_TO_USD) {
             require(
@@ -172,16 +209,16 @@ contract HedgeManager is Ownable {
         //xfer usdc and copc
         if (_direction == ConversionDirection.USD_TO_COP) {
             usdcContract.transferFrom(msg.sender, address(this), totalAmount);
-            copcContract.transferFrom(
-                address(this),
-                msg.sender,
-                convertedAmount
-            );
+            copcContract.transfer(msg.sender, convertedAmount);
+            // copcContract.transferFrom(
+            //     address(this),
+            //     msg.sender,
+            //     convertedAmount
+            // );
         }
         if (_direction == ConversionDirection.COP_TO_USD) {
             copcContract.transferFrom(msg.sender, address(this), totalAmount);
-            usdcContract.transferFrom(
-                address(this),
+            usdcContract.transfer(
                 msg.sender,
                 convertedAmount
             );
@@ -196,7 +233,10 @@ contract HedgeManager is Ownable {
             feeRequirement,
             block.timestamp,
             _duration,
-            usdToCopRate
+            usdToCopRate,
+            false,
+            false,
+            0
         );
 
         hedges[hedgeId] = hedge;
@@ -204,7 +244,7 @@ contract HedgeManager is Ownable {
         ownerToHedgeIds[msg.sender].push(hedgeId);
 
         // future[msg.sender] = 1;
-        return true;
+        return hedgeId;
     }
 
     // provide liquidity for copc
@@ -220,6 +260,5 @@ contract HedgeManager is Ownable {
     {
         return copcBalances[_lp];
     }
-
 
 }

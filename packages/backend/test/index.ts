@@ -35,6 +35,8 @@ const assertFailedTransaction = async (tx, errorMessage) => {
   expect(transactionFailed).to.equal(true);
 }
 
+const SECONDS_IN_DAY = 86400;
+
 
 const USD_TO_COP = ethers.BigNumber.from("0");
 const COP_TO_USD = ethers.BigNumber.from("1");
@@ -66,29 +68,29 @@ describe("Greeter", function () {
   it ("should be able to provide liquidity", async function() {
     const [owner, liquidityProvider] = await ethers.getSigners();
 
-    // give LP some COPC
-    await COPC.mint(liquidityProvider.address, 100000000);
+    // give LP some COPC 100usd worth
+    await COPC.mint(liquidityProvider.address, 40000000000000);
 
-    await COPC.connect(liquidityProvider).approve(HedgeManager.address, 100000000);
+    await COPC.connect(liquidityProvider).approve(HedgeManager.address, 40000000000000);
 
-    await HedgeManager.connect(liquidityProvider).addCopcLiquidity(100000000);
+    await HedgeManager.connect(liquidityProvider).addCopcLiquidity(40000000000000);
 
     const balance = (await HedgeManager.getCopcLiquidityBalance(liquidityProvider.address)).toString();
 
-    expect(balance).to.equal('100000000');
+    expect(balance).to.equal('40000000000000');
   });
   it ("should set exchange rate correctly", async function() {
-    await HedgeManager.setExchangeRate(4000);
+    await HedgeManager.setExchangeRate(400000);
 
     const exchangeRate = (await HedgeManager.getExchangeRate()).toString();
 
-    expect(exchangeRate).to.equal('4000');
+    expect(exchangeRate).to.equal('400000');
   });
   it ("only owner can set exchange rate correctly", async function() {
     const [owner, randomUser] = await ethers.getSigners();
 
     await assertFailedTransaction(
-      HedgeManager.connect(randomUser).setExchangeRate(4000),
+      HedgeManager.connect(randomUser).setExchangeRate(400000),
       'Ownable: caller is not the owner'
     );
   });
@@ -96,9 +98,84 @@ describe("Greeter", function () {
   it ("should calculate exchange rate correctly", async function() {
     const [owner, randomUser] = await ethers.getSigners();
 
+    const rateCop = await HedgeManager.getAmountForExchangeRate(100000000, USD_TO_COP, 400000);
+    const rateUSD = await HedgeManager.getAmountForExchangeRate(100000000, COP_TO_USD, 400000);
+    expect(rateCop).to.equal(40000000000000);
+    expect(rateUSD.eq(ethers.BigNumber.from("250"))).to.equal(true);
+  });
+
+  it ("should create hedge succesfully", async function() {
+    const [owner, liquidityProvider, hedgeUser] = await ethers.getSigners();
+
+    //TODO write test for platform fee and collateral requirements
+    const hundredUSD = 100000000;
+    const fee = Number((await HedgeManager.getFee(hundredUSD)).toString());
+    const collateral = Number((await HedgeManager.getCollateralRequirement(hundredUSD)).toString());
+
+    // console.log({fee, collateral});
+    // console.log({liquidity: (await HedgeManager.getAmountForExchangeRate(hundredUSD, USD_TO_COP)).toString()});
+
+    //hedge user needs some USDC
+    const totalAmount = hundredUSD + fee + collateral;
+
+    await USDC.mint(hedgeUser.address, totalAmount); //100 usd
+    await USDC.connect(hedgeUser).approve(HedgeManager.address, ethers.constants.MaxUint256);
+    await COPC.connect(hedgeUser).approve(HedgeManager.address, ethers.constants.MaxUint256);
+
+    const tenDays = SECONDS_IN_DAY * 10; // 10 day contract
+
+    const hedgeTx = await HedgeManager.connect(hedgeUser).createHedge(USD_TO_COP, tenDays, hundredUSD);
+
+    const hedge = await HedgeManager.getHedge(1);
+    // console.log({hedge});
+
+    //check hedge is created correctly
+
+    expect(hedge.direction).to.equal(0);
+    expect(hedge.id).to.equal(1);
+    expect(hedge.owner).to.equal(hedgeUser.address);
+    expect(hedge.amount).to.equal(ethers.BigNumber.from(hundredUSD));
+    expect(hedge.collateral).to.equal(ethers.BigNumber.from(collateral));
+    expect(hedge.fee).to.equal(ethers.BigNumber.from(fee));
+    // expect(hedge.startDate).to.equal(ethers.BigNumber.from(collateral));
+    expect(hedge.lockedInRate).to.equal(ethers.BigNumber.from(400000));
+    expect(hedge.duration).to.equal(ethers.BigNumber.from(tenDays));
+
+    //check balances are correct
+    const hedgeManagerUSDCBalance = (await USDC.balanceOf(HedgeManager.address)).toString();
+    expect(hedgeManagerUSDCBalance).to.equal('113000000');
+    const hedgeUserUSDCBalance = (await USDC.balanceOf(hedgeUser.address)).toString();
+    expect(hedgeUserUSDCBalance).to.equal('0');
+    const hedgeUserCOPCBalance = (await COPC.balanceOf(hedgeUser.address)).toString();
+    expect(hedgeUserCOPCBalance).to.equal('40000000000000');
+  });
+
+  it("should return all hedges for address", async function() {
+    const [owner, liquidityProvider, hedgeUser] = await ethers.getSigners();
+    const hedges = await HedgeManager.getHedges(hedgeUser.address);
+  });
+
+  it("should allow hedge to be closed", async function() {
+    const [owner, liquidityProvider, hedgeUser] = await ethers.getSigners();
+
+    await assertFailedTransaction(
+      HedgeManager.closeHedge(1),
+      'only the owner may close the hedge'
+    );
+
+    const hedges = await HedgeManager.getHedges(hedgeUser.address);
     
-    const rate = await HedgeManager.getAmountForExchangeRate(1000000, ethers.BigNumber.from("1"));
-    console.log(rate.toString());
+    await HedgeManager.connect(hedgeUser).closeHedge(1);
+
+    const hedge = await HedgeManager.getHedge(1);
+    
+    const hedgeManagerUSDCBalance = (await USDC.balanceOf(HedgeManager.address)).toString();
+    expect(hedgeManagerUSDCBalance).to.equal('13000000');
+    const hedgeUserUSDCBalance = (await USDC.balanceOf(hedgeUser.address)).toString();
+    expect(hedgeUserUSDCBalance).to.equal('100000000');
+    const hedgeUserCOPCBalance = (await COPC.balanceOf(hedgeUser.address)).toString();
+    expect(hedgeUserCOPCBalance).to.equal('0');
+
   });
 
 });
