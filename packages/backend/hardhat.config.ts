@@ -6,16 +6,19 @@ import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-etherscan';
 
 dotenv.config({ path: '../../.env' });
-const defaultNetwork = 'localhost';
+// const defaultNetwork = 'localhost';
+
+console.log(process.env.ETHERSCAN_API_KEY);
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 const config: HardhatUserConfig = {
   solidity: '0.8.10',
-  defaultNetwork,
+  // defaultNetwork,
 
   networks: {
+    hardhat: {},
     localhost: {
       chainId: 31337,
     },
@@ -47,7 +50,7 @@ const config: HardhatUserConfig = {
     // },
     goerli: {
       chainId: 5,
-      url: `https://eth-goerli.alchemyapi.io/v2/k1AJPfZO7lFnh0dPXyBlrs9HA95eofr0`,
+      url: `https://eth-goerli.g.alchemy.com/v2/ShHM5xifGO6sDTi8fmzz1nhkX-k2781F`,
       // url: `https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`,
       accounts: [`ba17373e3edb04eb715d4584ce2d9023da41354b72a81a5c8524dcc8d36bd6c4`],
     },
@@ -78,14 +81,14 @@ const config: HardhatUserConfig = {
     //   accounts: [`${process.env.PRIVATE_KEY}`],
     // },
   },
+  etherscan: {
+    apiKey: "R6IEECMMRT3SN9ISHN29HN55FQMFW9R8MC" as string
+  },
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
     },
     tokenOwner: 1,
-    etherscan: {
-      apiKey: process.env.ETHERSCAN_API_KEY as string,
-    },
   },
 };
 
