@@ -3,19 +3,45 @@ import getConfig from 'next/config';
 const { publicRuntimeConfig } = getConfig();
 import { useContractRead } from 'wagmi'
 import { abi } from '../contracts/HedgeManagerAbi.json';
+import { abi as copcAbi } from '../contracts/CopcABI.json';
+import { ethers } from 'ethers';
 
 // const hedgeAddress = process.env.HEDGE_MANAGER_ADDRESS;
 
-export const Statistics = () => {
-  console.log({ addr: process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS });
-  // console.log({ abi });
-  // const address: String = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as String;
+const LiquidityCopc = () => {
+  const address: string = process.env.NEXT_PUBLIC_COPC_ADDRESS as string;
+  const hedgeMaangerAddress: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
   const { data, isError, isLoading } = useContractRead({
-    address: "0xF3B74e76c2E5B2770AA366CCAacd1B6955B070a7",
+    address,
+    abi: copcAbi,
+    functionName: 'balanceOf',
+    args: [hedgeMaangerAddress]
+  });
+  console.log({ data });
+  const copcBalance = data ? Number(data.toString()).toLocaleString('es') : 'N/A';
+  return (
+    <div className="w-1/4">
+      <article className="text-xs">
+        Liquidity Available
+      </article>
+      <article className="font-bold">
+        {copcBalance} COPC
+      </article>
+    </div>
+  )
+}
+
+export const Statistics = () => {
+  // console.log({ abi });
+  const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
+  const { data, isError, isLoading } = useContractRead({
+    address,
     abi,
     functionName: 'getExchangeRate',
   });
-  console.log({ data, isError, isLoading, status })
+
+  const copString = data ? data.toLocaleString('es') : "N/A";
+
   return (
     <div className="flex p-4 mx-4 bg-accent text-white rounded-lg justify-between">
       <div className="w-1/4">
@@ -23,7 +49,7 @@ export const Statistics = () => {
           Current Exchange Rate
         </article>
         <article className="font-bold">
-          1 USD @ 4,985 COP
+          1 USD @ {copString} COP
         </article>
       </div>
       <div className="w-1/4">
@@ -34,20 +60,13 @@ export const Statistics = () => {
           3%
         </article>
       </div>
-      <div className="w-1/4">
-        <article className="text-xs">
-          Liquidity Available
-        </article>
-        <article className="font-bold">
-          10K USD
-        </article>
-      </div>
+      <LiquidityCopc />
       <div className="w-1/5">
         <article className="text-xs">
           Contracts Open
         </article>
         <article className="font-bold">
-          3
+          0
         </article>
       </div>
     </div>

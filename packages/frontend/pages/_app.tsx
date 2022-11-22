@@ -113,7 +113,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider coolMode theme={lightTheme({
-        accentColor: '#18A0FB',
+        accentColor: '#0090FF',
         accentColorForeground: 'white',
         borderRadius: 'medium',
         fontStack: 'system',
