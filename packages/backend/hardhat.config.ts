@@ -8,6 +8,8 @@ import '@nomiclabs/hardhat-etherscan';
 dotenv.config({ path: '../../.env' });
 // const defaultNetwork = 'localhost';
 
+console.log(process.env.ETHERSCAN_API_KEY);
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -85,7 +87,9 @@ const config: HardhatUserConfig = {
     },
     tokenOwner: 1,
     etherscan: {
-      apiKey: process.env.ETHERSCAN_API_KEY as string,
+      apiKey: {
+        goerli: process.env.ETHERSCAN_API_KEY as string,
+      }
     },
   },
 };

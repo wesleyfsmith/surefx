@@ -26,8 +26,8 @@ const Logo = () => (
       <path d="M131.42 81.0601L126.04 94.04C125.04 96.45 122.69 98.01 120.09 98.01H72.04C70.27 98.01 68.9199 98.51 67.9699 99.5C67.0199 100.5 66.54 101.92 66.54 103.78C66.54 106.13 68.8499 108.15 73.4699 109.82C77.3199 111.27 83.51 112.97 92.04 114.91C100.57 116.86 108.08 119.28 114.55 122.17C128.58 128.46 135.49 138.35 135.26 151.84C135.08 161.16 131.12 168.54 123.38 173.97C116.82 178.54 109.01 180.83 99.9499 180.83H41.0799C36.4899 180.83 33.3699 176.16 35.1299 171.92L40.51 158.94C41.51 156.53 43.8599 154.97 46.4599 154.97H99.9399C101.93 154.97 103.38 154.63 104.29 153.95C105.01 153.5 105.38 152.68 105.38 151.51C105.42 148.66 103.84 146.53 100.63 145.13C96.69 143.32 89.65 141.33 79.51 139.16C69.37 136.99 61.09 134.34 54.66 131.22C42.71 125.56 36.71 116.42 36.67 103.79C36.67 94.15 40.38 86.32 47.81 80.3C54.46 74.87 62.54 72.15 72.05 72.15H125.48C130.07 72.15 133.19 76.8201 131.43 81.0601H131.42Z" fill="#F9F9F9" />
     </g>
     <defs>
-      <filter id="filter0_d_1_25" x="0.280029" y="0.392456" width="642.76" height="257.995" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+      <filter id="filter0_d_1_25" x="0.280029" y="0.392456" width="642.76" height="257.995" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
         <feOffset dy="4" />
         <feGaussianBlur stdDeviation="2" />
@@ -43,7 +43,6 @@ const Logo = () => (
 export const Navbar = () => {
   const router = useRouter();
   const { address, isConnected } = useAccount()
-  console.log({ address, isConnected });
 
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect()

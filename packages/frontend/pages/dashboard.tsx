@@ -9,7 +9,8 @@ import { CalendarPicker } from '@/components/CalendarPicker';
 import { HedgeConfirmationModal } from '@/components/HedgeConfirmationModal';
 import { ContractList } from '@/components/ContractList';
 import { Statistics } from '@/components/Statistics';
-
+import HedgeABI from '../contracts/HedgeManagerAbi.json';
+import { useContractRead } from 'wagmi';
 
 
 const CurrencyPicker = () => {
@@ -51,7 +52,7 @@ const CurrencyPicker = () => {
   );
 };
 
-const AmountInput = ({amount, setAmount}) => {
+const AmountInput = ({ amount, setAmount }) => {
   const updateAmount = (e) => {
     setAmount(e.target.value);
   }
@@ -65,52 +66,26 @@ const AmountInput = ({amount, setAmount}) => {
   );
 };
 
-const Stats = () => {
-  return (
-    <div className="stats shadow m-4 w-full">
-
-      <div className="stat">
-        <div className="stat-figure text-secondary">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </div>
-        <div className="stat-title">Current Exchange Rate</div>
-        <div className="stat-value">1 USD @ 5,023 COP</div>
-        <div className="stat-desc">↗︎ 400 (22%)</div>
-      </div>
-
-      <div className="stat">
-        <div className="stat-figure text-secondary">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-        </div>
-        <div className="stat-title">Platform Exchange Rate</div>
-        <div className="stat-value">1 USD @ 4875 COP</div>
-        <div className="stat-desc">↗︎ 400 (22%)</div>
-      </div>
-
-      <div className="stat">
-        <div className="stat-figure text-secondary">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
-        </div>
-        <div className="stat-title">Contracts Open</div>
-        <div className="stat-value">3</div>
-        <div className="stat-desc">↘︎ 90 (14%)</div>
-      </div>
-
-    </div>
-  );
-};
-
-const OpenContract = ({ addContract, setContractDetails }) => {
+const OpenContract = ({ setContractDetails }) => {
   const [startDate, setStartDate] = useState(new Date());
   const [amount, setAmount] = useState(0);
-  const [endDate, setEndDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date());
+
+  const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
+  const { data, isError, isLoading } = useContractRead({
+    address,
+    abi: HedgeABI.abi,
+    functionName: 'getExchangeRate',
+  });
+
+  const copString = data ? data.toLocaleString('es') : "N/A";
 
   const setDeets = (e) => {
     setContractDetails({
       amount,
       expiration: endDate,
       baseCurrency: 'USD',
-      lockedInRate: 4000
+      lockedInRate: copString
     })
   }
   return (
@@ -131,9 +106,9 @@ const OpenContract = ({ addContract, setContractDetails }) => {
           </input>
         </div> */}
         <div>
-        <label className="label">
-         <span className="label-text">Expiration Date</span>
-        </label>
+          <label className="label">
+            <span className="label-text">Expiration Date</span>
+          </label>
           <CalendarPicker endDate={endDate} setEndDate={setEndDate} />
         </div>
 
@@ -148,13 +123,13 @@ const OpenContract = ({ addContract, setContractDetails }) => {
               Locked-in Rate
             </article>
             <article className="font-bold">
-              $4875 COP - $1 USD
+              ${copString} COP - $1 USD
             </article>
           </div>
-          
+
 
           <div className="w-1/2">
-          <label onClick={setDeets} htmlFor="my-modal-3" className="btn btn-primary w-full">Create</label>
+            <label onClick={setDeets} htmlFor="my-modal-3" className="btn btn-primary w-full">Create</label>
             {/* <button onClick={addContract} className="btn btn-primary w-full">Create</button> */}
           </div>
         </div>
@@ -164,42 +139,6 @@ const OpenContract = ({ addContract, setContractDetails }) => {
 
   );
 };
-
-const abi = [
-  {
-    'inputs': [],
-    'stateMutability': 'nonpayable',
-    'type': 'constructor'
-  },
-  {
-    'inputs': [],
-    'name': 'createContract',
-    'outputs': [
-      {
-        'internalType': 'uint256',
-        'name': '',
-        'type': 'uint256'
-      }
-    ],
-    'stateMutability': 'nonpayable',
-    'type': 'function'
-  },
-  {
-    'inputs': [],
-    'name': 'stake',
-    'outputs': [
-      {
-        'internalType': 'uint256',
-        'name': '',
-        'type': 'uint256'
-      }
-    ],
-    'stateMutability': 'nonpayable',
-    'type': 'function'
-  }
-];
-
-let rendersBig = 0;
 
 export default function Dashboard() {
 
@@ -222,37 +161,37 @@ export default function Dashboard() {
     lockedInRate: 4000
   });
 
-  const { config } = usePrepareContractWrite({
-    addressOrName: '0xc0f88d928760E2c4AD0DD0A060c3566C23f5fbF7',
-    contractInterface: abi,
-    functionName: 'createContract'
-  });
+  // const { config } = usePrepareContractWrite({
+  //   addressOrName: '0xc0f88d928760E2c4AD0DD0A060c3566C23f5fbF7',
+  //   contractInterface: abi,
+  //   functionName: 'createContract'
+  // });
 
-  if (config && config.request) {
-    config.request.gasPrice = '50';
-  }
+  // if (config && config.request) {
+  //   config.request.gasPrice = '50';
+  // }
 
-  const { data, error, isError, write } = useContractWrite(config);
+  // const { data, error, isError, write } = useContractWrite(config);
 
-  console.log({ config, data, write });
+  // console.log({ config, data, write });
 
-  const { isLoading, isSuccess } = useWaitForTransaction({
-    hash: data?.hash,
-  });
+  // const { isLoading, isSuccess } = useWaitForTransaction({
+  //   hash: data?.hash,
+  // });
 
-  const addContract = () => {
-    console.log({ write });
-    write?.();
-    // contracts.push(
-    //   {
-    //     rate: '$5,115',
-    //     amount: '$1,000,000.00 COP',
-    //     collateral: '5%',
-    //     expiration: 'Jan 6, 2023'
-    //   }
-    // );
-    // setContracts([...contracts]);
-  };
+  // const addContract = () => {
+  //   console.log({ write });
+  //   write?.();
+  //   // contracts.push(
+  //   //   {
+  //   //     rate: '$5,115',
+  //   //     amount: '$1,000,000.00 COP',
+  //   //     collateral: '5%',
+  //   //     expiration: 'Jan 6, 2023'
+  //   //   }
+  //   // );
+  //   // setContracts([...contracts]);
+  // };
 
 
   return (
@@ -271,7 +210,7 @@ export default function Dashboard() {
           <div className="w-1/2">
             <OpenContract
               setContractDetails={setContractDetails}
-             addContract={addContract} />
+            />
           </div>
           <div className="w-1/2">
             <ContractList />

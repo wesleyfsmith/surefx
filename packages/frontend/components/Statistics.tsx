@@ -2,7 +2,7 @@ import { useState } from 'react';
 import getConfig from 'next/config';
 const { publicRuntimeConfig } = getConfig();
 import { useContractRead } from 'wagmi'
-import { abi } from '../contracts/HedgeManagerAbi.json';
+import abi from '../contracts/HedgeManagerAbi.json';
 import { abi as copcAbi } from '../contracts/CopcABI.json';
 import { ethers } from 'ethers';
 
@@ -17,7 +17,6 @@ const LiquidityCopc = () => {
     functionName: 'balanceOf',
     args: [hedgeMaangerAddress]
   });
-  console.log({ data });
   const copcBalance = data ? Number(data.toString()).toLocaleString('es') : 'N/A';
   return (
     <div className="w-1/4">
