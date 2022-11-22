@@ -47,6 +47,8 @@ const { chains, provider } = configureChains(
   [alchemyProvider({ apiKey: 'ShHM5xifGO6sDTi8fmzz1nhkX-k2781F' })]
 );
 
+//test
+
 // const { connectors } = getDefaultWallets({
 //   appName: 'create-web3',
 //   chains,
