@@ -84,7 +84,7 @@ const connectors = connectorsForWallets([
     wallets: [
       // wallet.rainbow({ chains }),
       // wallet.walletConnect({ chains }),
-      // rainbowWeb3AuthConnector({ chains }),
+      rainbowWeb3AuthConnector({ chains }),
       wallet.metaMask({ chains }),
     ],
   },
