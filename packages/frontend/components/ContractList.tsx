@@ -22,33 +22,33 @@ const CurrentContractItem = ({ contract }) => {
       </div>
 
 
-      <button className="btn btn-secondary btn-outline">Close</button>
+      <button className="btn btn-primary btn-outline">Close</button>
     </div>
   );
 };
 
 export const ContractList = () => {
   const { address, isConnected } = useAccount()
-  
+
   const [contracts, setContracts] = useState([
-    // {
-    //   rate: '$4,982',
-    //   amount: '$12,000,000.00 COP',
-    //   collateral: '5%',
-    //   expiration: 'Dec 11, 2022'
-    // },
-    // {
-    //   rate: '$4,872',
-    //   amount: '$6,500,000.00 COP',
-    //   collateral: '10%',
-    //   expiration: 'Dec 31, 2022'
-    // },
-    // {
-    //   rate: '$5,015',
-    //   amount: '$4,000,000.00 COP',
-    //   collateral: '5%',
-    //   expiration: 'Jan 31, 2023'
-    // }
+    {
+      rate: '$4,982',
+      amount: '$12,000,000.00 COP',
+      collateral: '5%',
+      expiration: 'Dec 11, 2022'
+    },
+    {
+      rate: '$4,872',
+      amount: '$6,500,000.00 COP',
+      collateral: '10%',
+      expiration: 'Dec 31, 2022'
+    },
+    {
+      rate: '$5,015',
+      amount: '$4,000,000.00 COP',
+      collateral: '5%',
+      expiration: 'Jan 31, 2023'
+    }
   ]);
   const contractElements = contracts.map((contract) => {
     return <CurrentContractItem contract={contract} />;

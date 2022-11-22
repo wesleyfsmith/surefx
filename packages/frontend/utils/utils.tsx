@@ -7,9 +7,9 @@ export const removeUSDCDecimals = (amount: number) => {
 };
 
 export const getCOPCDecimals = (amount: number) => {
-  return amount * 100000;
+  return amount * 100;
 };
 
 export const removeCOPCDecimals = (amount: number) => {
-  return amount / 100000;
+  return amount / 100;
 };

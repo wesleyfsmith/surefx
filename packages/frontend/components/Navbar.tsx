@@ -51,6 +51,10 @@ export const Navbar = () => {
     connect({ connector: connectors[0] });
   };
 
+  const isLinkSelected = (href: string): string => {
+    return router.asPath == href ? 'border-b-2 border-primary' : '';
+  }
+
   return (
     <div className="bg-neutral">
       <div className="flex max-w-screen-xl mx-auto text-white drop-shadow mb-4 p-2 justify-between">
@@ -59,16 +63,16 @@ export const Navbar = () => {
         <Logo />
         <div className="w-4/5 flex">
           {/* <a className="btn btn-ghost normal-case text-xl">SureFX</a> */}
-          <div className="flex flex-col justify-center">
-            <div className="flex h-6">
+          <div onClick={() => router.push('/dashboard')} className={`flex flex-col justify-center ${isLinkSelected('/dashboard')} hover:text-gray-300`}>
+            <div className="flex h-6 ">
               <ShieldCheckIcon />
-              <article className="ml-1" onClick={() => router.push('/dashboard')}>Hedge</article>
+              <article className="ml-1" >Hedge</article>
             </div>
           </div>
-          <div className="flex flex-col justify-center ml-4">
+          <div onClick={() => router.push('/stake')} className={`flex flex-col justify-center ml-4 ${isLinkSelected('/stake')} hover:text-gray-300`}>
             <div className="flex h-6">
               <ArrowUturnDownIcon />
-              <article className="ml-1" onClick={() => router.push('/stake')}>Stake</article>
+              <article className="ml-1" >Stake</article>
             </div>
             <article></article>
           </div>

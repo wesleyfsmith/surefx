@@ -1,8 +1,8 @@
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
 import HedgeABI from '../contracts/HedgeManagerAbi.json';
 import { useContractRead } from 'wagmi';
-import { getUSDCDecimals, removeUSDCDecimals } from "@/utils/utils";
-import { ethers } from "ethers";
+import { getUSDCDecimals, removeUSDCDecimals, removeCOPCDecimals } from "@/utils/utils";
+import { BigNumber, ethers } from "ethers";
 
 //TODO make this view work both ways in the UI
 export const HedgeConfirmationModal = ({ contractDetails }) => {
@@ -14,29 +14,37 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
     address,
     abi: HedgeABI.abi,
     functionName: 'getFee',
-    args: [contractDetails.amount]
+    args: [getUSDCDecimals(contractDetails.amount)]
   });
 
   const { data: dataCollateral, isError: collateralIsError, isLoading: collateralIsLoading } = useContractRead({
     address,
     abi: HedgeABI.abi,
     functionName: 'getCollateralRequirement',
-    args: [contractDetails.amount]
+    args: [getUSDCDecimals(contractDetails.amount)]
   });
 
   const { data: dataExchange, isError: exchangeIsError, isLoading: exchangeIsLoading } = useContractRead({
     address,
     abi: HedgeABI.abi,
-    functionName: 'getAmountForCurrentExchangeRate',
-    args: [contractDetails.amount, ethers.BigNumber.from("0"), contractDetails.lockedInRate * 100]
+    functionName: 'getAmountForExchangeRate',
+    args: [getUSDCDecimals(contractDetails.amount), ethers.BigNumber.from("0"), contractDetails.lockedInRate * 100]
   });
 
   console.log({ dataExchange });
 
-  const fee = dataFee ? Number(dataFee.toString()).toLocaleString('es') : '0';
-  const colateral = dataCollateral ? Number(dataCollateral.toString()).toLocaleString('es') : '0';
+  const fee = dataFee ? removeUSDCDecimals(Number(dataFee.toString())).toLocaleString('es') : '0';
+  const colateral = dataCollateral ? removeUSDCDecimals(Number(dataCollateral.toString())).toLocaleString('es') : '0';
 
-  const exchangeRateAmount = dataExchange ? Number(dataExchange.toString()).toLocaleString('es') : '0';
+  const exchangeRateAmount = dataExchange ? removeCOPCDecimals(Number(dataExchange.toString())).toLocaleString('es') : '0';
+
+  let totalRequired = 'N/A';
+
+  if (dataFee && dataCollateral && dataExchange) {
+    const bigNumTotal: BigNumber = dataFee.add(dataCollateral).add(dataExchange);
+    console.log({ bigNumTotal: bigNumTotal.toString() })
+    totalRequired = (Number(fee) + Number(colateral) + Number(contractDetails.amount)).toString();
+  }
 
 
   return (
@@ -66,7 +74,7 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
           <article className="py-2 pt-8">The contract will expire on {contractDetails.expiration.toDateString()}</article>
           <article className="py-2">Fee: {fee} {contractDetails.baseCurrency}</article>
           <article className="py-2">Colateral: {colateral} {contractDetails.baseCurrency}</article>
-          <article className="py-2">Total Required: {contractDetails.lockedInRate} {contractDetails.baseCurrency}</article>
+          <article className="py-2">Total Required: {totalRequired} {contractDetails.baseCurrency}</article>
           <button className="btn btn-primary w-full">Confirm</button>
         </div>
       </div>

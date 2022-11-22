@@ -81,16 +81,14 @@ const config: HardhatUserConfig = {
     //   accounts: [`${process.env.PRIVATE_KEY}`],
     // },
   },
+  etherscan: {
+    apiKey: "R6IEECMMRT3SN9ISHN29HN55FQMFW9R8MC" as string
+  },
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
     },
     tokenOwner: 1,
-    etherscan: {
-      apiKey: {
-        goerli: process.env.ETHERSCAN_API_KEY as string,
-      }
-    },
   },
 };
 
