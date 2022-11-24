@@ -5,10 +5,10 @@ import {
   useContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
-import { CalendarPicker } from '@/components/CalendarPicker';
-import { HedgeConfirmationModal } from '@/components/HedgeConfirmationModal';
-import { ContractList } from '@/components/ContractList';
-import { Statistics } from '@/components/Statistics';
+import { CalendarPicker } from '../components/CalendarPicker';
+import { HedgeConfirmationModal } from '../components/HedgeConfirmationModal';
+import { ContractList } from '../components/ContractList';
+import { Statistics } from '../components/Statistics';
 import HedgeABI from '../contracts/HedgeManagerAbi.json';
 import { useContractRead } from 'wagmi';
 

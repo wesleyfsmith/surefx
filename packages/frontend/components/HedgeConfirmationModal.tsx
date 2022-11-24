@@ -1,7 +1,7 @@
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
 import HedgeABI from '../contracts/HedgeManagerAbi.json';
 import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
-import { getUSDCDecimals, removeUSDCDecimals, removeCOPCDecimals } from "@/utils/utils";
+import { getUSDCDecimals, removeUSDCDecimals, removeCOPCDecimals } from "../utils/utils";
 import { BigNumber, ethers } from "ethers";
 
 const SECONDS_IN_DAY = 86400;
