@@ -84,7 +84,7 @@ const connectors = connectorsForWallets([
     wallets: [
       // wallet.rainbow({ chains }),
       // wallet.walletConnect({ chains }),
-      // rainbowWeb3AuthConnector({ chains }),
+      rainbowWeb3AuthConnector({ chains }),
       wallet.metaMask({ chains }),
     ],
   },
@@ -114,7 +114,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   if (!isMounted) return null;
   return (
     <WagmiConfig client={wagmiClient}>
-      {isMounted &&
+      {/* {isMounted &&
         <RainbowKitProvider coolMode theme={lightTheme({
           accentColor: '#0090FF',
           accentColorForeground: 'white',
@@ -129,7 +129,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           <Component {...pageProps} />
 
         </RainbowKitProvider>
-      }
+      } */}
     </WagmiConfig>
   );
 };
