@@ -50,8 +50,8 @@ export const ContractList = () => {
       expiration: 'Jan 31, 2023'
     }
   ]);
-  const contractElements = contracts.map((contract) => {
-    return <CurrentContractItem contract={contract} />;
+  const contractElements = contracts.map((contract, i) => {
+    return <CurrentContractItem key={i} contract={contract} />;
   });
   return (
     <div className="m-4">

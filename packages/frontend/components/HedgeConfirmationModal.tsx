@@ -10,9 +10,6 @@ const ConfirmButton = ({ expiration, amount }) => {
 
   let differenceIndays = Math.ceil((expiration.getTime() - new Date().getTime()) / (1000 * 3600 * 24));
 
-  console.log({ amount });
-
-
 
   const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
   const { config } = usePrepareContractWrite({
@@ -28,29 +25,26 @@ const ConfirmButton = ({ expiration, amount }) => {
 
   const { data, error, isError, write } = useContractWrite(config);
 
-  console.log({ config, data, write });
-
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
   });
 
 
   const buttonText = isLoading ? 'Processing...' : 'Confirm';
+  const buttonCss = isLoading ? ' btn-disabled' : '';
 
   const sumbitTx = () => {
-    console.log({ write });
-    // write?.();
+    // console.log({ write });
+    write?.();
   }
 
   return (
-    <button onClick={sumbitTx} className="btn btn-primary w-full">{buttonText}</button>
+    <button onClick={sumbitTx} className={`btn btn-primary w-full ${buttonCss}`}>{buttonText}</button>
   )
 }
 
 //TODO make this view work both ways in the UI
 export const HedgeConfirmationModal = ({ contractDetails }) => {
-
-  // console.log({ abi });
 
   const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
   const { data: dataFee, isError, isLoading } = useContractRead({
@@ -74,8 +68,6 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
     args: [getUSDCDecimals(contractDetails.amount), ethers.BigNumber.from("0"), contractDetails.lockedInRate * 100]
   });
 
-  console.log({ dataExchange });
-
   const fee = dataFee ? removeUSDCDecimals(Number(dataFee.toString())).toLocaleString('es') : '0';
   const colateral = dataCollateral ? removeUSDCDecimals(Number(dataCollateral.toString())).toLocaleString('es') : '0';
 
@@ -85,11 +77,9 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
 
   if (dataFee && dataCollateral && dataExchange) {
     const bigNumTotal: BigNumber = dataFee.add(dataCollateral).add(dataExchange);
-    console.log({ bigNumTotal: bigNumTotal.toString() })
     totalRequired = (Number(fee) + Number(colateral) + Number(contractDetails.amount)).toString();
   }
-  100000000
-  43210000000
+
   return (
     <div>
       <input type="checkbox" id="my-modal-3" className="modal-toggle" />

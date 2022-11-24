@@ -2,18 +2,16 @@ import { useState } from 'react';
 import getConfig from 'next/config';
 const { publicRuntimeConfig } = getConfig();
 import { useContractRead } from 'wagmi'
-import abi from '../contracts/HedgeManagerAbi.json';
-import { abi as copcAbi } from '../contracts/CopcABI.json';
+import HedgeABI from '../contracts/HedgeManagerAbi.json';
+import copcAbi from '../contracts/CopcABI.json';
 import { ethers } from 'ethers';
-
-// const hedgeAddress = process.env.HEDGE_MANAGER_ADDRESS;
 
 const LiquidityCopc = () => {
   const address: string = process.env.NEXT_PUBLIC_COPC_ADDRESS as string;
   const hedgeMaangerAddress: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
   const { data, isError, isLoading } = useContractRead({
     address,
-    abi: copcAbi,
+    abi: copcAbi.abi,
     functionName: 'balanceOf',
     args: [hedgeMaangerAddress]
   });
@@ -31,11 +29,10 @@ const LiquidityCopc = () => {
 }
 
 export const Statistics = () => {
-  // console.log({ abi });
   const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
   const { data, isError, isLoading } = useContractRead({
     address,
-    abi,
+    abi: HedgeABI.abi,
     functionName: 'getExchangeRate',
   });
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { ReceiptPercentIcon } from '@heroicons/react/24/outline';
 import { LockOpenIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/router';
 // import { FooterBlack } from './employee/footer/FooterBlack';
 // import { EyeIcon } from '@heroicons/react/outline';
 // import { CreditCardIcon } from '@heroicons/react/outline';
@@ -98,6 +99,7 @@ const FooterBlack = () => (
 export default function LandingPage() {
 
   // md:h-full from-primary to-neutral bg-gradient-to-br
+  const router = useRouter();
 
   return (
     <div>
@@ -118,7 +120,7 @@ export default function LandingPage() {
               {'SureFX’s mission is to unlock the power of DeFi and Web3 so anyone can do business in a foreign currency without the risk of losing money when they exchange back to their local currency.'}
             </article>
             <div className="form-control">
-              <a className="w-full" href={`/dashboard`} download>
+              <a className="w-full" onClick={() => router.push('/dashboard')}>
                 <button className="btn btn-primary mt-4 w-full">Hedge with SureFX</button>
               </a>
             </div>
