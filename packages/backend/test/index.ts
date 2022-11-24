@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 
 const deployNewCOPCContract = async () => {
   const COPCFactory = await ethers.getContractFactory("BasicERC20");
-  const COPCContract = await COPCFactory.deploy("COPC", "COPC", 2);
+  const COPCContract = await COPCFactory.deploy("COPC", "COPC", 6);
   await COPCContract.deployed();
   return COPCContract;
 };
@@ -28,7 +28,7 @@ const assertFailedTransaction = async (tx, errorMessage) => {
     await tx;
   } catch (error) {
     // console.log({err: error.message, thirdparam});
-    if (error.message ===`VM Exception while processing transaction: reverted with reason string '${errorMessage}'`) {
+    if (error.message === `VM Exception while processing transaction: reverted with reason string '${errorMessage}'`) {
       transactionFailed = true;
     }
   }
@@ -45,8 +45,16 @@ let HedgeManager: any;
 let USDC: any;
 let COPC: any;
 
-describe("Greeter", function () {
-  before(async function() {
+const addDecimals = (amount: number) => {
+  return amount * 1000000;
+}
+
+const removeDecimals = (amount: number) => {
+  return amount / 1000000;
+}
+
+describe("Hedge Manager", function () {
+  before(async function () {
     COPC = await deployNewCOPCContract();
     USDC = await deployNewUSDCContract();
     HedgeManager = await deployNewHedgeManager(USDC.address, COPC.address);
@@ -65,28 +73,31 @@ describe("Greeter", function () {
 
   //   expect(await greeter.greet()).to.equal("Hola, mundo!");
   // });
-  it ("should be able to provide liquidity", async function() {
+  it("should be able to provide liquidity", async function () {
     const [owner, liquidityProvider] = await ethers.getSigners();
 
+    const copQuantity = addDecimals(100) * 4000; // COPC 100usd worth
+
     // give LP some COPC 100usd worth
-    await COPC.mint(liquidityProvider.address, 40000000000000);
+    await COPC.mint(liquidityProvider.address, copQuantity);
 
-    await COPC.connect(liquidityProvider).approve(HedgeManager.address, 40000000000000);
+    await COPC.connect(liquidityProvider).approve(HedgeManager.address, ethers.constants.MaxUint256);
 
-    await HedgeManager.connect(liquidityProvider).addCopcLiquidity(40000000000000);
+    await HedgeManager.connect(liquidityProvider).addCopcLiquidity(copQuantity);
 
     const balance = (await HedgeManager.getCopcLiquidityBalance(liquidityProvider.address)).toString();
 
-    expect(balance).to.equal('40000000000000');
+    expect(balance).to.equal(copQuantity.toString());
   });
-  it ("should set exchange rate correctly", async function() {
-    await HedgeManager.setExchangeRate(400000);
+  it("should set exchange rate correctly", async function () {
+    //40,000
+    await HedgeManager.setExchangeRate(4000);
 
     const exchangeRate = (await HedgeManager.getExchangeRate()).toString();
 
-    expect(exchangeRate).to.equal('400000');
+    expect(exchangeRate).to.equal('4000');
   });
-  it ("only owner can set exchange rate correctly", async function() {
+  it("only owner can set exchange rate correctly", async function () {
     const [owner, randomUser] = await ethers.getSigners();
 
     await assertFailedTransaction(
@@ -95,22 +106,45 @@ describe("Greeter", function () {
     );
   });
 
-  it ("should calculate exchange rate correctly", async function() {
+  4321000000
+  4000000000
+  400000000000
+  400000000000
+  400000000000
+  400000000000
+
+
+  it("should calculate exchange rate correctly", async function () {
     const [owner, randomUser] = await ethers.getSigners();
 
-    const rateCop = await HedgeManager.getAmountForExchangeRate(100000000, USD_TO_COP, 400000);
-    const rateUSD = await HedgeManager.getAmountForExchangeRate(100000000, COP_TO_USD, 400000);
-    expect(rateCop).to.equal(40000000000000);
-    expect(rateUSD.eq(ethers.BigNumber.from("250"))).to.equal(true);
+    const amountUSD = addDecimals(100);
+
+    const rateCop = await HedgeManager.getAmountForCurrentExchangeRate(amountUSD, USD_TO_COP);
+    const expectedAmount = addDecimals(100 * 4000);
+
+    const fullCalculation = addDecimals(100) * 4000;
+
+    // console.log({ expected: removeDecimals(expectedAmount), fullCalculation: removeDecimals(fullCalculation) });
+
+    // console.log({ expectedAmount, rateCop: rateCop.toString() });
+    expect(rateCop.eq(ethers.BigNumber.from(addDecimals(100 * 4000)))).to.equal(true);
+    // const rateUSD = await HedgeManager.getAmountForCurrentExchangeRate(100000000, COP_TO_USD);
+    // expect(rateCop).to.equal(40000000000000);
+    // expect(rateUSD.eq(ethers.BigNumber.from("250"))).to.equal(true);
   });
 
-  it ("should create hedge succesfully", async function() {
+  it("should create hedge succesfully", async function () {
     const [owner, liquidityProvider, hedgeUser] = await ethers.getSigners();
 
     //TODO write test for platform fee and collateral requirements
-    const hundredUSD = 100000000;
+    const hundredUSD = addDecimals(100);
     const fee = Number((await HedgeManager.getFee(hundredUSD)).toString());
     const collateral = Number((await HedgeManager.getCollateralRequirement(hundredUSD)).toString());
+
+    // give LP some additional liquidity
+    // await COPC.mint(liquidityProvider.address, addDecimals());
+    // const liquidityAmount = removeDecimals(Number((await COPC.balanceOf(HedgeManager.address)).toString()));
+    // const requiredAmount = (await HedgeManager.getAmountForCurrentExchangeRate(hundredUSD, USD_TO_COP)).toString();
 
     // console.log({fee, collateral});
     // console.log({liquidity: (await HedgeManager.getAmountForExchangeRate(hundredUSD, USD_TO_COP)).toString()});
@@ -138,7 +172,7 @@ describe("Greeter", function () {
     expect(hedge.collateral).to.equal(ethers.BigNumber.from(collateral));
     expect(hedge.fee).to.equal(ethers.BigNumber.from(fee));
     // expect(hedge.startDate).to.equal(ethers.BigNumber.from(collateral));
-    expect(hedge.lockedInRate).to.equal(ethers.BigNumber.from(400000));
+    expect(hedge.lockedInRate).to.equal(ethers.BigNumber.from(4000));
     expect(hedge.duration).to.equal(ethers.BigNumber.from(tenDays));
 
     //check balances are correct
@@ -147,15 +181,15 @@ describe("Greeter", function () {
     const hedgeUserUSDCBalance = (await USDC.balanceOf(hedgeUser.address)).toString();
     expect(hedgeUserUSDCBalance).to.equal('0');
     const hedgeUserCOPCBalance = (await COPC.balanceOf(hedgeUser.address)).toString();
-    expect(hedgeUserCOPCBalance).to.equal('40000000000000');
+    expect(hedgeUserCOPCBalance).to.equal('400000000000');
   });
 
-  it("should return all hedges for address", async function() {
+  it("should return all hedges for address", async function () {
     const [owner, liquidityProvider, hedgeUser] = await ethers.getSigners();
     const hedges = await HedgeManager.getHedges(hedgeUser.address);
   });
 
-  it("should allow hedge to be closed", async function() {
+  it("should allow hedge to be closed", async function () {
     const [owner, liquidityProvider, hedgeUser] = await ethers.getSigners();
 
     await assertFailedTransaction(
@@ -164,11 +198,11 @@ describe("Greeter", function () {
     );
 
     const hedges = await HedgeManager.getHedges(hedgeUser.address);
-    
+
     await HedgeManager.connect(hedgeUser).closeHedge(1);
 
     const hedge = await HedgeManager.getHedge(1);
-    
+
     const hedgeManagerUSDCBalance = (await USDC.balanceOf(HedgeManager.address)).toString();
     expect(hedgeManagerUSDCBalance).to.equal('13000000');
     const hedgeUserUSDCBalance = (await USDC.balanceOf(hedgeUser.address)).toString();
