@@ -111,7 +111,7 @@ const wagmiClient = createClient({
 const App = ({ Component, pageProps }: AppProps) => {
   const isMounted = useIsMounted();
 
-  if (!isMounted) return null;
+  // if (!isMounted) return null;
   return (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider coolMode theme={lightTheme({
@@ -124,7 +124,9 @@ const App = ({ Component, pageProps }: AppProps) => {
         <NextHead>
           <title>SureFX</title>
         </NextHead>
-        <Component {...pageProps} />
+        {isMounted &&
+          <Component {...pageProps} />
+        }
       </RainbowKitProvider>
     </WagmiConfig>
   );
