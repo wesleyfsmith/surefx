@@ -10,6 +10,8 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
 import { InjectedConnector } from "wagmi/connectors/injected";
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+
 
 import '@rainbow-me/rainbowkit/styles.css';
 import {
@@ -17,9 +19,10 @@ import {
   RainbowKitProvider,
   Chain,
   lightTheme,
-  wallet,
   connectorsForWallets
 } from '@rainbow-me/rainbowkit';
+
+
 
 import { useIsMounted } from '../hooks';
 
@@ -78,17 +81,17 @@ const rainbowWeb3AuthConnector = ({ chains }) => ({
   },
 });
 
-const connectors = connectorsForWallets([
-  {
-    groupName: "Recommended",
-    wallets: [
-      // wallet.rainbow({ chains }),
-      // wallet.walletConnect({ chains }),
-      rainbowWeb3AuthConnector({ chains }),
-      wallet.metaMask({ chains }),
-    ],
-  },
-]);
+// const connectors = connectorsForWallets([
+//   {
+//     groupName: "Recommended",
+//     wallets: [
+//       // wallet.rainbow({ chains }),
+//       // wallet.walletConnect({ chains }),
+//       rainbowWeb3AuthConnector({ chains }),
+//       wallet.metaMask({ chains }),
+//     ],
+//   },
+// ]);
 
 const wagmiClient = createClient({
   autoConnect: true,
@@ -104,7 +107,19 @@ const wagmiClient = createClient({
   //     chainId: "0x5"
   //   },
   // })],
-  connectors,
+  connectors: [
+    // rainbowWeb3AuthConnector({ chains }),
+    new Web3AuthConnector({
+      chains,
+      options: {
+        enableLogging: true,
+        clientId: "BA_clSt7ZOqrvctbwpQPJX4oV6tbfm9st0gru2Z6-hYgvYGPThUPRg7UGL4mrL1vDl7-Mlt-Rjia-V4LotS84UA", // Get your own client id from https://dashboard.web3auth.io
+        network: "testnet",
+        chainId: "0x5"
+      },
+    }),
+    new MetaMaskConnector({ chains }),
+  ],
   provider,
 });
 
@@ -114,7 +129,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   if (!isMounted) return null;
   return (
     <WagmiConfig client={wagmiClient}>
-      {/* {isMounted &&
+      {isMounted &&
         <RainbowKitProvider coolMode theme={lightTheme({
           accentColor: '#0090FF',
           accentColorForeground: 'white',
@@ -129,7 +144,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           <Component {...pageProps} />
 
         </RainbowKitProvider>
-      } */}
+      }
     </WagmiConfig>
   );
 };

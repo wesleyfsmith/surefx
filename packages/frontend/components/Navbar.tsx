@@ -45,7 +45,8 @@ export const Navbar = () => {
   const { address, isConnected } = useAccount()
 
   const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect()
+  const { disconnect } = useDisconnect();
+  console.log({ connectors });
 
   const connectWallet = () => {
     connect({ connector: connectors[0] });
