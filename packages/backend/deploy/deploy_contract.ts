@@ -37,8 +37,8 @@ const deploy = async () => {
   const FakeUSDC = await hre.ethers.getContractFactory("BasicERC20");
   const FakeUSDCContract = await FakeUSDC.deploy("FakeUSDC", "FUSDC", 6);
 
-  const COPCFactory = await hre.ethers.getContractFactory("BasicERC20");
-  const COPC = await COPCFactory.deploy("COPC", "COPC", 2);
+  const COPCFactory = await hre.ethers.getContractFactory("COPC");
+  const COPC = await COPCFactory.deploy("COPC", "COPC", 6);
 
   const HedgeFactory = await hre.ethers.getContractFactory("HedgeManager");
   const HedgeContract = await HedgeFactory.deploy(FakeUSDCContract.address, COPC.address);

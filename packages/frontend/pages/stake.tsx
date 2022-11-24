@@ -208,7 +208,7 @@ export default function Dashboard() {
       </div>
       <Navbar />
       <div className="max-w-screen-xl mx-auto">
-      <div className="mt-4 ml-4">
+        <div className="mt-4 ml-4">
           <article className="text-xl pt-4">Hedging Pools</article>
         </div>
 
@@ -218,7 +218,7 @@ export default function Dashboard() {
           <Stats />
         </div>
         <StakeSFX />
-        
+
       </div>
     </div>
   );

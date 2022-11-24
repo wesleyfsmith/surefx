@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { ReceiptPercentIcon } from '@heroicons/react/24/outline';
 import { LockOpenIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/router';
 // import { FooterBlack } from './employee/footer/FooterBlack';
 // import { EyeIcon } from '@heroicons/react/outline';
 // import { CreditCardIcon } from '@heroicons/react/outline';
@@ -52,7 +53,7 @@ const Titlebar = () => (
     <div className="flex mx-auto justify-between">
       {/* <LogoNavBar /> */}
       {/* <img className="h-16 p-2 pl-8" src={'logo_repbase.png'}></img> */}
-      <img className="h-16 pl-8" src="SureFX_HORIZONTAL_NEGATIVO-02.png" />
+      <img className="h-16 md:pl-8" src="SureFX_HORIZONTAL_NEGATIVO-02.png" />
       {/* <article className="prose text-2xl font-bold p-2 text-primary pl-8">
         SureFX
       </article> */}
@@ -98,6 +99,7 @@ const FooterBlack = () => (
 export default function LandingPage() {
 
   // md:h-full from-primary to-neutral bg-gradient-to-br
+  const router = useRouter();
 
   return (
     <div>
@@ -109,7 +111,7 @@ export default function LandingPage() {
 
           </div>
           <Logo />
-          <div className="md:w-1/2 sm:w-full my-auto mx-auto px-2 pt-8">
+          <div className="md:w-1/2 sm:w-full my-auto mx-auto px-2 pt-16">
             <article className="prose text-2xl font-bold text-white text-center mb-4">
               {'Decentralized Currency Hedging For Emerging Markets'}
             </article>
@@ -118,7 +120,7 @@ export default function LandingPage() {
               {'SureFX’s mission is to unlock the power of DeFi and Web3 so anyone can do business in a foreign currency without the risk of losing money when they exchange back to their local currency.'}
             </article>
             <div className="form-control">
-              <a className="w-full" href={`/dashboard`} download>
+              <a className="w-full" onClick={() => router.push('/dashboard')}>
                 <button className="btn btn-primary mt-4 w-full">Hedge with SureFX</button>
               </a>
             </div>
@@ -129,24 +131,24 @@ export default function LandingPage() {
           </div> */}
         </div>
       </div>
-      <div className="flex flex-col mt-12 md:pb-24">
+      <div className="max-w-4xl flex flex-col mt-12 md:pb-24 mx-auto px-8 md:px-0">
         <article className="prose text-center mx-auto pb-4 md:pt-12 md:pb-12 font-bold text-2xl md:whitespace-pre">
           {'Forex hedging for emerging markets made cheaper and easier with DeFi'}
         </article>
-        <div className="flex flex-col md:flex-row justify-center mx-4 lg:w-4/5 md:mx-auto">
-          <div className="mx-12">
-            <ShieldCheckIcon className="w-20 mx-auto" />
+        <div className="flex flex-col md:flex-row justify-between">
+          <div className="mx-2">
+            <ShieldCheckIcon className="w-20 mx-auto text-primary" />
             <article className="prose prose-xl font-bold text-center ">Guarantee your bottom line</article>
             <article className="prose text-center">Freeze your exchange rate in the future to protect against price volatility</article>
           </div>
-          <div className="mx-12">
-            <ReceiptPercentIcon className="w-20 mx-auto" />
+          <div className="mx-2 mt-4 md:mt-0">
+            <ReceiptPercentIcon className="w-20 mx-auto text-primary" />
             {/* <CreditCardIcon className="w-20 mx-auto" /> */}
             <article className="prose prose-xl font-bold text-center ">Pay less, wait less</article>
             <article className="prose text-center">DeFi let's us charge a fraction of what businesses pay today and move your money instantly 24/7</article>
           </div>
-          <div className="mx-12">
-            <LockOpenIcon className="w-20 mx-auto" />
+          <div className="mx-2 mt-4 md:mt-0">
+            <LockOpenIcon className="w-20 mx-auto text-primary" />
             {/* <BadgeCheckIcon className="w-20 mx-auto" /> */}
             <article className="prose prose-xl font-bold text-center ">Built for everyone</article>
             <article className="prose text-center">Any business or person can easily use our protocol, with or without KYC and with a world-class UX</article>
@@ -155,7 +157,7 @@ export default function LandingPage() {
       </div>
 
       <div className="bg-gray-100 mt-8 pb-24">
-        <img className="w-1/3 mx-auto pt-16 " src="eth_bogota.png"></img>
+        <img className="w-4/5 md:w-1/3 mx-auto pt-16 " src="eth_bogota.png"></img>
         <article className="text-center md:pt-4   font-bold text-2xl pb-12">
           ETH Bogotá 2022 Hackathon Winners
         </article>

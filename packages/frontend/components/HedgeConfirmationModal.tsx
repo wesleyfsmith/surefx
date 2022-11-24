@@ -1,13 +1,50 @@
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
 import HedgeABI from '../contracts/HedgeManagerAbi.json';
-import { useContractRead } from 'wagmi';
+import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import { getUSDCDecimals, removeUSDCDecimals, removeCOPCDecimals } from "@/utils/utils";
 import { BigNumber, ethers } from "ethers";
 
+const SECONDS_IN_DAY = 86400;
+
+const ConfirmButton = ({ expiration, amount }) => {
+
+  let differenceIndays = Math.ceil((expiration.getTime() - new Date().getTime()) / (1000 * 3600 * 24));
+
+
+  const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: HedgeABI.abi,
+    functionName: 'createHedge',
+    args: [0, SECONDS_IN_DAY * differenceIndays, getUSDCDecimals(amount)]
+  });
+
+  // if (config && config.request) {
+  //   config.request.gasPrice = '50';
+  // }
+
+  const { data, error, isError, write } = useContractWrite(config);
+
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
+
+  const buttonText = isLoading ? 'Processing...' : 'Confirm';
+  const buttonCss = isLoading ? ' btn-disabled' : '';
+
+  const sumbitTx = () => {
+    // console.log({ write });
+    write?.();
+  }
+
+  return (
+    <button onClick={sumbitTx} className={`btn btn-primary w-full ${buttonCss}`}>{buttonText}</button>
+  )
+}
+
 //TODO make this view work both ways in the UI
 export const HedgeConfirmationModal = ({ contractDetails }) => {
-
-  // console.log({ abi });
 
   const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
   const { data: dataFee, isError, isLoading } = useContractRead({
@@ -31,8 +68,6 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
     args: [getUSDCDecimals(contractDetails.amount), ethers.BigNumber.from("0"), contractDetails.lockedInRate * 100]
   });
 
-  console.log({ dataExchange });
-
   const fee = dataFee ? removeUSDCDecimals(Number(dataFee.toString())).toLocaleString('es') : '0';
   const colateral = dataCollateral ? removeUSDCDecimals(Number(dataCollateral.toString())).toLocaleString('es') : '0';
 
@@ -42,10 +77,8 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
 
   if (dataFee && dataCollateral && dataExchange) {
     const bigNumTotal: BigNumber = dataFee.add(dataCollateral).add(dataExchange);
-    console.log({ bigNumTotal: bigNumTotal.toString() })
     totalRequired = (Number(fee) + Number(colateral) + Number(contractDetails.amount)).toString();
   }
-
 
   return (
     <div>
@@ -75,7 +108,7 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
           <article className="py-2">Fee: {fee} {contractDetails.baseCurrency}</article>
           <article className="py-2">Colateral: {colateral} {contractDetails.baseCurrency}</article>
           <article className="py-2">Total Required: {totalRequired} {contractDetails.baseCurrency}</article>
-          <button className="btn btn-primary w-full">Confirm</button>
+          <ConfirmButton amount={contractDetails.amount} expiration={contractDetails.expiration} />
         </div>
       </div>
     </div>
