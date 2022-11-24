@@ -84,7 +84,7 @@ const connectors = connectorsForWallets([
     wallets: [
       // wallet.rainbow({ chains }),
       // wallet.walletConnect({ chains }),
-      rainbowWeb3AuthConnector({ chains }),
+      // rainbowWeb3AuthConnector({ chains }),
       wallet.metaMask({ chains }),
     ],
   },
@@ -111,7 +111,7 @@ const wagmiClient = createClient({
 const App = ({ Component, pageProps }: AppProps) => {
   const isMounted = useIsMounted();
 
-  // if (!isMounted) return null;
+  if (!isMounted) return null;
   return (
     <WagmiConfig client={wagmiClient}>
       {isMounted &&
