@@ -114,20 +114,22 @@ const App = ({ Component, pageProps }: AppProps) => {
   // if (!isMounted) return null;
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider coolMode theme={lightTheme({
-        accentColor: '#0090FF',
-        accentColorForeground: 'white',
-        borderRadius: 'medium',
-        fontStack: 'system',
-        overlayBlur: 'small',
-      })} chains={chains}>
-        <NextHead>
-          <title>SureFX</title>
-        </NextHead>
-        {isMounted &&
+      {isMounted &&
+        <RainbowKitProvider coolMode theme={lightTheme({
+          accentColor: '#0090FF',
+          accentColorForeground: 'white',
+          borderRadius: 'medium',
+          fontStack: 'system',
+          overlayBlur: 'small',
+        })} chains={chains}>
+          <NextHead>
+            <title>SureFX</title>
+          </NextHead>
+
           <Component {...pageProps} />
-        }
-      </RainbowKitProvider>
+
+        </RainbowKitProvider>
+      }
     </WagmiConfig>
   );
 };
