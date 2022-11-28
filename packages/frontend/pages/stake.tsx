@@ -5,6 +5,7 @@ import {
   useContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
+import { PageLayout } from '../components/PageLayout';
 
 const abi = [
   {
@@ -188,6 +189,21 @@ const Pool = ({ name, address, apy, utilization, value, price }) => {
   )
 }
 
+const HowItWorks = () => {
+  return (
+    <div className="alert shadow-lg">
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info flex-shrink-0 w-12 h-12"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div>
+          <article className="text-xl">How it works</article>
+          <span>By adding your liquidity to the pool, you will earn platform fees from each hedging contract. You must keep your liquidity staked for the duration of at least one hedging contract. Listed rates are an estimated performance but in practice may be higher or lower depending on volume.</span>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
 const ProvideLiquidity = () => {
   return (
     <div className="flex flex-col">
@@ -199,27 +215,20 @@ const ProvideLiquidity = () => {
 
 export default function Dashboard() {
   return (
-    <div className="">
-      <div className="bg-warning p-4">
-        <div className="flex">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-          <span className="ml-4">Contracts are currently deployed on Goerli Testnet. Make sure your wallet is connected to Goerli.</span>
-        </div>
+    <PageLayout>
+      <div className="mt-4 ml-4">
+        <article className="text-xl pt-4">Hedging Pools</article>
       </div>
-      <Navbar />
-      <div className="max-w-screen-xl mx-auto">
-        <div className="mt-4 ml-4">
-          <article className="text-xl pt-4">Hedging Pools</article>
-        </div>
+      <div className="p-4">
+        <HowItWorks />
+      </div>
 
-        <ProvideLiquidity />
-        {/* <div className="m-4">
+      <ProvideLiquidity />
+      {/* <div className="m-4">
           <article className="text-xl">Stake SFX</article>
           <Stats />
         </div>
         <StakeSFX /> */}
-
-      </div>
-    </div>
+    </PageLayout>
   );
 }

@@ -6,7 +6,8 @@ import { useRouter } from 'next/router';
 import Web3AuthLoginButton from './Login';
 import Web3 from 'web3';
 import { Web3Auth } from '@web3auth/modal';
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import Link from 'next/link';
 
 const Logo = () => (
   <svg className="ml-2 mr-8" width="180" viewBox="0 0 644 259" fill="none" xmlns="http://www.w3.org/2000/svg">
