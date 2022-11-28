@@ -70,6 +70,7 @@ const OpenContract = ({ setContractDetails }) => {
   const [startDate, setStartDate] = useState(new Date());
   const [amount, setAmount] = useState(0);
   const [endDate, setEndDate] = useState(new Date());
+  // const [showModal, setShowModal] = useState(false);
 
   const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
   const { data, isError, isLoading } = useContractRead({

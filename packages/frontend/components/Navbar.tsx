@@ -46,11 +46,17 @@ export const Navbar = () => {
 
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
-  console.log({ connectors });
+  // console.log({ connectors });
+
+  console.log({ isConnected })
 
   const connectWallet = () => {
     connect({ connector: connectors[0] });
   };
+
+  const connectMetamask = () => {
+    connect({ connector: connectors[1] });
+  }
 
   const isLinkSelected = (href: string): string => {
     return router.asPath == href ? 'border-b-2 border-primary' : '';
@@ -84,20 +90,26 @@ export const Navbar = () => {
           </div>
         </div> */}
         </div>
-        <div className="flex flex-col justify-center w-64">
-          <ConnectButton />
-        </div>
+        {
+          isConnected &&
+          <div className="flex flex justify-end mr-2 w-64 my-1">
+            <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
+          </div>
+        }
 
-        <div className="flex flex-col justify-center">
-          {/* <Web3AuthLoginButton /> */}
-          {!isConnected &&
-            <button className="btn btn-outline btn-primary w-24 mr-2" onClick={() => connectWallet()}>Sign In</button>
-          }
-          {/* {isConnected &&
+
+        {!isConnected &&
+          <div className="flex justify-center">
+            {/* <Web3AuthLoginButton /> */}
+            <button className="btn btn-outline btn-primary w-24 mr-2 my-auto" onClick={() => connectWallet()}>Log In</button>
+            <button className="btn btn-outline btn-primary w-24 mr-2 my-auto" onClick={() => connectMetamask()}>Connect Metamask</button>
+
+            {/* {isConnected &&
             <button className="btn btn-outline btn-primary" onClick={() => disconnect()}>Sign Out</button>
           } */}
 
-        </div>
+          </div>
+        }
 
         {/* <div className="justify-end">
         <div className="w-1/8">

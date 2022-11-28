@@ -170,10 +170,10 @@ const Pool = ({ name, address, apy, utilization, value, price }) => {
             <article className="text-gray-400 mr-2">Pool Value:</article>
             <article>{value} {name}</article>
           </div>
-          <div className="flex">
+          {/* <div className="flex">
             <article className="text-gray-400 mr-2">sf{name} Price:</article>
             <article>{price} {name}</article>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="flex border p-4">
@@ -213,11 +213,11 @@ export default function Dashboard() {
         </div>
 
         <ProvideLiquidity />
-        <div className="m-4">
+        {/* <div className="m-4">
           <article className="text-xl">Stake SFX</article>
           <Stats />
         </div>
-        <StakeSFX />
+        <StakeSFX /> */}
 
       </div>
     </div>

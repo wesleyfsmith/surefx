@@ -4,6 +4,7 @@ const { publicRuntimeConfig } = getConfig();
 import { useContractRead } from 'wagmi'
 import HedgeABI from '../contracts/HedgeManagerAbi.json';
 import copcAbi from '../contracts/CopcABI.json';
+import { getUSDCDecimals, removeUSDCDecimals, removeCOPCDecimals } from "../utils/utils";
 import { ethers } from 'ethers';
 
 const LiquidityCopc = () => {
@@ -15,7 +16,7 @@ const LiquidityCopc = () => {
     functionName: 'balanceOf',
     args: [hedgeMaangerAddress]
   });
-  const copcBalance = data ? Number(data.toString()).toLocaleString('es') : 'N/A';
+  const copcBalance = data ? Number(removeCOPCDecimals(data)).toLocaleString('es') : 'N/A';
   return (
     <div className="w-1/4">
       <article className="text-xs">

@@ -1,16 +1,66 @@
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
 import HedgeABI from '../contracts/HedgeManagerAbi.json';
+import COPC from '../contracts/CopcABI.json';
+import USDC from '../contracts/CopcABI.json';
 import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import { getUSDCDecimals, removeUSDCDecimals, removeCOPCDecimals } from "../utils/utils";
 import { BigNumber, ethers } from "ethers";
 
 const SECONDS_IN_DAY = 86400;
 
+const ApproveButton = () => {
+
+  const hedgeManagerAddress: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
+
+  // const copcAddress: string = process.env.NEXT_PUBLIC_COPC_ADDRESS as string;
+  // const { config } = usePrepareContractWrite({
+  //   address: copcAddress,
+  //   abi: COPC.abi,
+  //   functionName: 'approve',
+  //   args: [hedgeManagerAddress, ethers.constants.MaxUint256]
+  // });
+
+  const usdcAddress: string = process.env.NEXT_PUBLIC_USDC_ADDRESS as string;
+  const { config } = usePrepareContractWrite({
+    address: usdcAddress,
+    abi: USDC.abi,
+    functionName: 'approve',
+    args: [hedgeManagerAddress, ethers.constants.MaxUint256]
+  });
+
+  // if (config && config.request) {
+  //   config.request.gasPrice = '50';
+  // }
+
+  const { data, error, isError, write } = useContractWrite(config);
+
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
+  console.log({ error })
+
+
+  const buttonText = isLoading ? 'Processing...' : 'Approve';
+  const buttonCss = isLoading ? ' btn-disabled' : '';
+
+  const sumbitTx = () => {
+    console.log({ write });
+    write?.();
+  }
+
+  if (isSuccess) {
+    return <article className="text-center">You approved the contract.</article>
+  }
+
+  return (
+    <button onClick={sumbitTx} className={`btn btn-primary w-full ${buttonCss}`}>{buttonText}</button>
+  )
+}
+
 const ConfirmButton = ({ expiration, amount }) => {
 
   let differenceIndays = Math.ceil((expiration.getTime() - new Date().getTime()) / (1000 * 3600 * 24));
-
-
   const address: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
   const { config } = usePrepareContractWrite({
     address,
@@ -20,7 +70,7 @@ const ConfirmButton = ({ expiration, amount }) => {
   });
 
   // if (config && config.request) {
-  //   config.request.gasPrice = '50';
+  //   config.request.gasPrice = '25';
   // }
 
   const { data, error, isError, write } = useContractWrite(config);
@@ -34,8 +84,12 @@ const ConfirmButton = ({ expiration, amount }) => {
   const buttonCss = isLoading ? ' btn-disabled' : '';
 
   const sumbitTx = () => {
-    // console.log({ write });
+    console.log({ write });
     write?.();
+  }
+
+  if (isSuccess) {
+    return <article className="text-center">Your transaction was a success, you may close this modal.</article>
   }
 
   return (
@@ -64,8 +118,8 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
   const { data: dataExchange, isError: exchangeIsError, isLoading: exchangeIsLoading } = useContractRead({
     address,
     abi: HedgeABI.abi,
-    functionName: 'getAmountForExchangeRate',
-    args: [getUSDCDecimals(contractDetails.amount), ethers.BigNumber.from("0"), contractDetails.lockedInRate * 100]
+    functionName: 'getAmountForCurrentExchangeRate',
+    args: [getUSDCDecimals(contractDetails.amount), ethers.BigNumber.from("0")]
   });
 
   const fee = dataFee ? removeUSDCDecimals(Number(dataFee.toString())).toLocaleString('es') : '0';
@@ -109,6 +163,7 @@ export const HedgeConfirmationModal = ({ contractDetails }) => {
           <article className="py-2">Colateral: {colateral} {contractDetails.baseCurrency}</article>
           <article className="py-2">Total Required: {totalRequired} {contractDetails.baseCurrency}</article>
           <ConfirmButton amount={contractDetails.amount} expiration={contractDetails.expiration} />
+          {/* <ApproveButton /> */}
         </div>
       </div>
     </div>
