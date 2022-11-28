@@ -79,7 +79,7 @@ export const Navbar = () => {
           <div onClick={() => router.push('/stake')} className={`flex flex-col justify-center ml-4 ${isLinkSelected('/stake')} hover:text-gray-300`}>
             <div className="flex h-6">
               <ArrowUturnDownIcon />
-              <article className="ml-1" >Stake</article>
+              <article className="ml-1" >Pool</article>
             </div>
             <article></article>
           </div>

@@ -183,7 +183,7 @@ export default function LandingPage() {
           Meet Repbase
         </article>
       </div> */}
-      <div className="bg-white px-8">
+      <div className="bg-white px-8 max-w-screen-xl mx-auto">
         <article className="text-center pt-8 md:pt-24 font-bold text-2xl pb-2">
           Start your journey with the SureFX Protocol
         </article>

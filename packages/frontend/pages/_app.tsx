@@ -140,8 +140,10 @@ const App = ({ Component, pageProps }: AppProps) => {
           <NextHead>
             <title>SureFX</title>
           </NextHead>
+          <div className="h-screen">
+            <Component {...pageProps} />
+          </div>
 
-          <Component {...pageProps} />
 
         </RainbowKitProvider>
       }
