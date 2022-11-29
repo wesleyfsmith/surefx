@@ -5,9 +5,9 @@ import { forwardRef, useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
-export const CalendarPicker = ({endDate, setEndDate}) => {
+export const CalendarPicker = ({ endDate, setEndDate }) => {
   const [startDate, setStartDate] = useState(new Date())
-  
+
 
   useEffect(() => {
     if (startDate > endDate) setStartDate(endDate)
@@ -17,60 +17,60 @@ export const CalendarPicker = ({endDate, setEndDate}) => {
     if (startDate > endDate) setEndDate(startDate)
   }, [startDate])
   return (
-    <div className="relative w-40">
-          <DatePicker
-            selected={endDate}
-            onChange={(date) => setEndDate(date)}
-            selectsEnd
-            startDate={startDate}
-            endDate={endDate}
-            nextMonthButtonLabel=">"
-            previousMonthButtonLabel="<"
-            popperClassName="react-datepicker-left"
-            customInput={<ButtonInput />}
-            renderCustomHeader={({
-              date,
-              decreaseMonth,
-              increaseMonth,
-              prevMonthButtonDisabled,
-              nextMonthButtonDisabled,
-            }) => (
-              <div className="flex items-center justify-between px-2 py-2">
-                <span className="text-lg text-gray-700">
-                  {format(date, 'MMMM yyyy')}
-                </span>
+    <div className="relative w-48">
+      <DatePicker
+        selected={endDate}
+        onChange={(date) => setEndDate(date)}
+        selectsEnd
+        startDate={startDate}
+        endDate={endDate}
+        nextMonthButtonLabel=">"
+        previousMonthButtonLabel="<"
+        popperClassName="react-datepicker-left"
+        customInput={<ButtonInput />}
+        renderCustomHeader={({
+          date,
+          decreaseMonth,
+          increaseMonth,
+          prevMonthButtonDisabled,
+          nextMonthButtonDisabled,
+        }) => (
+          <div className="flex items-center justify-between px-2 py-2">
+            <span className="text-lg text-gray-700">
+              {format(date, 'MMMM yyyy')}
+            </span>
 
-                <div className="space-x-2">
-                  <button
-                    onClick={decreaseMonth}
-                    disabled={prevMonthButtonDisabled}
-                    type="button"
-                    className={`
+            <div className="space-x-2">
+              <button
+                onClick={decreaseMonth}
+                disabled={prevMonthButtonDisabled}
+                type="button"
+                className={`
                                             ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
                                             inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500
                                         `}
-                  >
-                    <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
-                  </button>
+              >
+                <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
+              </button>
 
-                  <button
-                    onClick={increaseMonth}
-                    disabled={nextMonthButtonDisabled}
-                    type="button"
-                    className={`
+              <button
+                onClick={increaseMonth}
+                disabled={nextMonthButtonDisabled}
+                type="button"
+                className={`
                                             ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
                                             inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500
                                         `}
-                  >
-                    <ChevronRightIcon className="w-5 h-5 text-gray-600" />
-                  </button>
-                </div>
-              </div>
-            )}
-          />
-        </div>
+              >
+                <ChevronRightIcon className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+          </div>
+        )}
+      />
+    </div>
   )
-  
+
 }
 
 export const PickerPage = () => {

@@ -12,6 +12,7 @@ import { Statistics } from '../components/Statistics';
 import HedgeABI from '../contracts/HedgeManagerAbi.json';
 import { useContractRead } from 'wagmi';
 import { PageLayout } from '../components/PageLayout';
+import { ArrowLongRightIcon } from '@heroicons/react/24/outline';
 
 
 const CurrencyPicker = () => {
@@ -40,10 +41,13 @@ const CurrencyPicker = () => {
             </select>
           </div>
           <div className="flex flex-col justify-center">
-            <article className="w-24">for</article>
+            <article className="text-center">for</article>
           </div>
           <div className="flex flex-col justify-center">
-            <article className="w-24 text-2xl">{oppositeCurrency}</article>
+            <ArrowLongRightIcon className="pt-1 h-8" />
+          </div>
+          <div className="flex flex-col justify-center">
+            <article className="text-2xl text-bold text-right">{oppositeCurrency}</article>
           </div>
         </div>
       </div>

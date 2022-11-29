@@ -1,9 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import { ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { ReceiptPercentIcon } from '@heroicons/react/24/outline';
 import { LockOpenIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+
 // import { FooterBlack } from './employee/footer/FooterBlack';
 // import { EyeIcon } from '@heroicons/react/outline';
 // import { CreditCardIcon } from '@heroicons/react/outline';
@@ -60,7 +62,7 @@ const Titlebar = () => (
 
       <div className="flex pr-8">
         <div className="flex flex-col justify-center">
-          <a href="/dashboard" className="btn btn-primary btn-outline w-36">Launch App</a>
+          <Link href="/dashboard" className="btn btn-primary btn-outline w-36">Launch App</Link>
         </div>
         <a className="hidden md:block w-full mx-2 my-auto" href="mailto: contact@surefx.xyz" >
           <article className="prose text-white mx-2 my-auto">
