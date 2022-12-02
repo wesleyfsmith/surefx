@@ -52,7 +52,7 @@ export const Navbar = () => {
   const { disconnect } = useDisconnect();
   // console.log({ connectors });
 
-  console.log({ connector });
+  console.log({ address });
 
   const connectWallet = () => {
     connect({ connector: connectors[0] });

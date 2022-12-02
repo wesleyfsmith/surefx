@@ -41,7 +41,7 @@ const DepositUSDModal = ({ setFiatAmount }) => {
 
 const FiatAccount = ({ currencyType, fiatAmount }) => {
 
-  const [hasLinked, setHasLinked] = useState(true);
+  const [hasLinked, setHasLinked] = useState(false);
 
   const [linkToken, setLinkToken] = useState(null);
   const generateToken = async () => {
@@ -91,6 +91,8 @@ const FiatAccount = ({ currencyType, fiatAmount }) => {
 export default function Account() {
   const [fiatAmount, setFiatAmount] = useState(0);
   const [fiatAmountCop, setFiatAmountCop] = useState(0);
+  const { account } = useAccount();
+  console.log({ account });
   return (
     <PageLayout>
       <DepositUSDModal setFiatAmount={setFiatAmount} />

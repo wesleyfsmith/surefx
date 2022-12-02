@@ -42,7 +42,6 @@ export default async function handler(
     country_codes: ['US'],
   };
   const createTokenResponse = await client.linkTokenCreate(request);
-  console.log(createTokenResponse.data)
   res.json(createTokenResponse.data);
   try {
 

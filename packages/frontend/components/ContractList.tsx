@@ -14,9 +14,9 @@ const CloseContractButton = ({ hedgeId }) => {
     args: [hedgeId]
   });
 
-  if (config && config.request) {
-    config.request.gasPrice = '25';
-  }
+  // if (config && config.request) {
+  //   config.request.gasPrice = '25';
+  // }
 
   const { data, error, isError, write } = useContractWrite(config);
 
@@ -55,11 +55,11 @@ const CurrentContractItem = ({ hedgeId }) => {
   const isGrayedOut = hedge.closed ? ' bg-gray-50 ' : '';
 
   return (
-    <div className={`"border rounded-lg ${isGrayedOut}  p-4 mb-4"`}>
+    <div className={`border rounded-lg ${isGrayedOut} p-4 mb-4`}>
       <div className="flex justify-between" >
         <div>
           <article className="text-sm">Rate</article>
-          <article>{hedge.lockedInRate.toString()}</article>
+          <article>${hedge.lockedInRate.toString()}</article>
         </div>
         <div>
           <article className="text-sm">Amount</article>
