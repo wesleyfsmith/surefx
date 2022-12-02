@@ -4,42 +4,15 @@ import {
   usePrepareContractWrite,
   useContractWrite,
   useWaitForTransaction,
+  useContractRead
 } from 'wagmi';
 import { PageLayout } from '../components/PageLayout';
+import HedgeABI from '../contracts/HedgeManagerAbi.json';
+import { useState } from 'react';
+import copcAbi from '../contracts/CopcABI.json';
+import { getUSDCDecimals, removeUSDCDecimals, removeCOPCDecimals } from "../utils/utils";
 
-const abi = [
-  {
-    'inputs': [],
-    'stateMutability': 'nonpayable',
-    'type': 'constructor'
-  },
-  {
-    'inputs': [],
-    'name': 'createContract',
-    'outputs': [
-      {
-        'internalType': 'uint256',
-        'name': '',
-        'type': 'uint256'
-      }
-    ],
-    'stateMutability': 'nonpayable',
-    'type': 'function'
-  },
-  {
-    'inputs': [],
-    'name': 'stake',
-    'outputs': [
-      {
-        'internalType': 'uint256',
-        'name': '',
-        'type': 'uint256'
-      }
-    ],
-    'stateMutability': 'nonpayable',
-    'type': 'function'
-  }
-];
+
 
 const StakeStats = () => {
   return (
@@ -147,7 +120,25 @@ const StakeSFX = () => {
   )
 }
 
-const Pool = ({ name, address, apy, utilization, value, price }) => {
+const BalanceCopc = () => {
+  const address: string = process.env.NEXT_PUBLIC_COPC_ADDRESS as string;
+  const hedgeMaangerAddress: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
+  const { data, isError, isLoading } = useContractRead({
+    address,
+    abi: copcAbi.abi,
+    functionName: 'balanceOf',
+    args: [hedgeMaangerAddress]
+  });
+  const copcBalance = data ? Number(removeCOPCDecimals(data)).toLocaleString('es') : 'N/A';
+  return (
+    <div className="flex flex-col justify-center">
+      <article>COPC Balance: {copcBalance}</article>
+    </div>
+  )
+}
+
+const Pool = ({ name, address, apy, utilization, value, price, depositAmount }) => {
+
   return (
     <div className="flex flex-col m-4 border">
       <div className=" flex justify-between p-4 ">
@@ -178,11 +169,18 @@ const Pool = ({ name, address, apy, utilization, value, price }) => {
         </div>
       </div>
       <div className="flex border p-4">
-        <div className="flex flex-col justify-center">
-          <article>{name} Balance: 0</article>
-        </div>
+        {
+          name === 'COPC' &&
+          <BalanceCopc />
+        }
+        {
+          name === 'USDC' &&
+          <div className="flex flex-col justify-center">
+            <article>{name} Balance: 0</article>
+          </div>
+        }
 
-        <button className="btn btn-sm btn-primary ml-2 btn-outline">{`Stake ${name}`}</button>
+        <label htmlFor="my-modal-3" className="btn btn-sm btn-primary ml-2 btn-outline">{`Stake ${name}`}</label>
       </div>
     </div>
 
@@ -191,9 +189,9 @@ const Pool = ({ name, address, apy, utilization, value, price }) => {
 
 const HowItWorks = () => {
   return (
-    <div className="alert shadow-lg">
+    <div className="alert shadow">
       <div>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info flex-shrink-0 w-12 h-12"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info flex-shrink-0 w-12 h-12 text-primary"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         <div>
           <article className="text-xl">How it works</article>
           <span>By adding your liquidity to the pool, you will earn platform fees from each hedging contract. You must keep your liquidity staked for the duration of at least one hedging contract. Listed rates are an estimated performance but in practice may be higher or lower depending on volume.</span>
@@ -204,18 +202,79 @@ const HowItWorks = () => {
   )
 }
 
-const ProvideLiquidity = () => {
+const ProvideLiquidity = ({ depositAmount }) => {
   return (
     <div className="flex flex-col">
-      <Pool name="COPC" address="0xCBB2...d4a2" apy="2.3%" utilization='63.7%' value='823 K' price='5120.076' />
-      <Pool name="USDC" address="0xA991...c742" apy="4.5%" utilization='70.2%' value='1.2 M' price='1.076' />
+      <Pool depositAmount={depositAmount} name="COPC" address="0xCBB2...d4a2" apy="2.3%" utilization='63.7%' value='823 K' price='5120.076' />
+      <Pool depositAmount={depositAmount} name="USDC" address="0xA991...c742" apy="4.5%" utilization='70.2%' value='132' price='1.076' />
+    </div>
+  )
+}
+
+const DepositUSDModal = ({ setFiatAmount }) => {
+
+  const [currentAmount, setCurrentAmount] = useState(0);
+
+  const hedgeAddress: string = process.env.NEXT_PUBLIC_HEDGE_MANAGER_ADDRESS as string;
+  const { config } = usePrepareContractWrite({
+    address: hedgeAddress,
+    abi: HedgeABI.abi,
+    functionName: 'addCopcLiquidity',
+    args: [currentAmount * 6]
+  });
+
+  // if (config && config.request) {
+  //   config.request.gasPrice = '25';
+  // }
+
+  const { data, error, isError, write } = useContractWrite(config);
+
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
+  const buttonText = isLoading ? 'Processing...' : 'Confirm';
+  const buttonCss = isLoading ? ' btn-disabled' : '';
+
+  const sumbitTx = () => {
+    write?.();
+  }
+
+
+  const updateAmount = (e) => {
+    setCurrentAmount(e.target.value);
+  };
+
+  const confirmAmount = () => {
+    // console.log({ write })
+    write?.();
+    // setFiatAmount(currentAmount);
+  }
+
+  return (
+    <div>
+      <input type="checkbox" id="my-modal-3" className="modal-toggle" />
+      <div className="modal">
+
+        <div className="modal-box relative">
+          <label htmlFor="my-modal-3" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+          <h3 className="text-lg font-bold mb-4">Deposit COPC</h3>
+          <input value={currentAmount} onChange={updateAmount} type="number" placeholder="Amount" className="input w-full max-w-xs input-bordered mr-4" />
+          <button onClick={() => confirmAmount()} className={`btn btn-primary ${buttonCss}`}>{buttonText}</button>
+
+          {/* <ConfirmButton amount={contractDetails.amount} expiration={contractDetails.expiration} /> */}
+          {/* <ApproveButton /> */}
+        </div>
+      </div>
     </div>
   )
 }
 
 export default function Dashboard() {
+  const [fiatAmountCop, setFiatAmountCop] = useState(0);
   return (
     <PageLayout>
+      <DepositUSDModal setFiatAmount={setFiatAmountCop} />
       <div className="mt-4 ml-4">
         <article className="text-xl pt-4">Hedging Pools</article>
       </div>
@@ -223,7 +282,7 @@ export default function Dashboard() {
         <HowItWorks />
       </div>
 
-      <ProvideLiquidity />
+      <ProvideLiquidity depositAmount={fiatAmountCop} />
       {/* <div className="m-4">
           <article className="text-xl">Stake SFX</article>
           <Stats />

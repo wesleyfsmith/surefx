@@ -14,9 +14,9 @@ const CloseContractButton = ({ hedgeId }) => {
     args: [hedgeId]
   });
 
-  if (config && config.request) {
-    config.request.gasPrice = '25';
-  }
+  // if (config && config.request) {
+  //   config.request.gasPrice = '25';
+  // }
 
   const { data, error, isError, write } = useContractWrite(config);
 
@@ -52,12 +52,14 @@ const CurrentContractItem = ({ hedgeId }) => {
 
   const expirationTime = new Date((Number(hedge.startDate.toString()) + Number(hedge.duration.toString())) * 1000);
 
+  const isGrayedOut = hedge.closed ? ' bg-gray-50 ' : '';
+
   return (
-    <div className="border rounded-lg  p-4 mb-4">
+    <div className={`border rounded-lg ${isGrayedOut} p-4 mb-4`}>
       <div className="flex justify-between" >
         <div>
           <article className="text-sm">Rate</article>
-          <article>{hedge.lockedInRate.toString()}</article>
+          <article>${hedge.lockedInRate.toString()}</article>
         </div>
         <div>
           <article className="text-sm">Amount</article>
@@ -79,7 +81,7 @@ const CurrentContractItem = ({ hedgeId }) => {
       </div>
       {
         hedge.closed &&
-        <article className="text-accent text-center mt-2">This hedging contract has been closed.</article>
+        <article className="text-accent text-center mt-4 border-t pt-2">This hedging contract has been closed.</article>
       }
     </div>
 

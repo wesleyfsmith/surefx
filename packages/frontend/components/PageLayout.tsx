@@ -13,7 +13,7 @@ const GoerliWarning = () => (
 const Footer = () => (
   <div className="w-full">
     <div className="max-w-screen-xl mx-auto py-4 px-4">
-      <div className="bg-neutral w-full rounded-lg p-7 flex">
+      <div className="bg-neutral w-full rounded-lg p-6 flex">
         <article className="text-center text-white">
           Copyright © 2022 - All rights reserved
         </article>
