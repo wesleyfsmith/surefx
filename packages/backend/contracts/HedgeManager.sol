@@ -1,3 +1,35 @@
+// using SafeMath for uint256;
+
+// address public owner;
+// mapping (address => uint256) public balances;
+// mapping (address => mapping (uint256 => uint256)) public borrowStartTimes;
+// SafeERC20 public token;
+// SafeERC20 public collateralToken;
+// uint256 public borrowId;
+
+// constructor(address _token, address _collateralToken) public {
+//     owner = msg.sender;
+//     token = SafeERC20(_token);
+//     collateralToken = SafeERC20(_collateralToken);
+//     borrowId = 0;
+// }
+
+// function borrow(uint256 _amount) public {
+//     collateralToken.transferFrom(msg.sender, address(this), _amount);
+//     balances[msg.sender] = balances[msg.sender].add(_amount);
+//     token.transfer(msg.sender, _amount);
+//     borrowStartTimes[msg.sender][borrowId] = now;
+//     borrowId++;
+// }
+
+// function repay(uint256 _amount, uint256 _borrowId) public {
+//     require(_amount <= balances[msg.sender]);
+//     token.transferFrom(msg.sender, address(this), _amount);
+//     collateralToken.transfer(msg.sender, _amount);
+//     balances[msg.sender] = balances[msg.sender].sub(_amount);
+//     borrowStartTimes[msg.sender][_borrowId] = 0;
+// }
+
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
@@ -72,11 +104,9 @@ contract HedgeManager is Ownable {
     }
 
     //calculates the collateral requirement in USD
-    function getCollateralRequirement(uint256 _amount)
-        public
-        view
-        returns (uint256)
-    {
+    function getCollateralRequirement(
+        uint256 _amount
+    ) public view returns (uint256) {
         //TODO safemath
         //TODO maybe make this variable for each user that can open contracts
         return _amount / 10;
@@ -135,11 +165,9 @@ contract HedgeManager is Ownable {
         if (block.timestamp >= hedge.startDate + hedge.duration + lockupTime) {}
     }
 
-    function getHedgeExpiration(uint256 _hedgeId)
-        public
-        view
-        returns (uint256)
-    {}
+    function getHedgeExpiration(
+        uint256 _hedgeId
+    ) public view returns (uint256) {}
 
     function closeHedge(uint256 _hedgeId) public {
         //person closing must be the hedge owner
@@ -262,11 +290,9 @@ contract HedgeManager is Ownable {
         copcBalances[msg.sender] = copcBalances[msg.sender] + _amount;
     }
 
-    function getCopcLiquidityBalance(address _lp)
-        public
-        view
-        returns (uint256)
-    {
+    function getCopcLiquidityBalance(
+        address _lp
+    ) public view returns (uint256) {
         return copcBalances[_lp];
     }
 }
